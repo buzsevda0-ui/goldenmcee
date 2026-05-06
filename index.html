@@ -3,163 +3,147 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>GoldenMC Panel</title>
+<title>GoldenMC</title>
 
 <style>
-body{
-  background:#0a0806;
-  color:#FFD700;
-  font-family:Arial;
-  text-align:center;
-}
-button{
-  margin:5px;
-  padding:10px 20px;
-  background:#111;
-  border:1px solid gold;
-  color:gold;
-  cursor:pointer;
-}
-input{
-  padding:8px;
-  margin:5px;
-  background:#111;
-  border:1px solid gold;
-  color:white;
-}
-.card{
-  border:1px solid gold;
-  margin:10px;
-  padding:10px;
-}
+body{background:#0a0806;color:#FFD700;font-family:Arial;text-align:center}
+.container{max-width:800px;margin:auto}
+.card{background:#111;border:1px solid gold;padding:15px;margin:10px;border-radius:8px}
+button{padding:10px 15px;margin:5px;background:black;color:gold;border:1px solid gold;cursor:pointer}
+input{padding:8px;margin:5px;background:black;color:white;border:1px solid gold}
 </style>
 
 </head>
-<body>
 
-<h1>GoldenMC</h1>
+<body>
+<div class="container">
+
+<h1>GoldenMC Market</h1>
 
 <button onclick="register()">Kayıt Ol</button> <button onclick="login()">Giriş Yap</button>
 
-<h2>VIP Satın Al</h2>
-<input id="rank" placeholder="VIP adı">
-<input id="price" placeholder="Fiyat">
-<br>
-<button onclick="buy()">Satın Al</button>
+<h2>VIP Paketler</h2>
+
+<div class="card">
+  VIP - 60₺<br>
+  <button onclick="buy('VIP',60)">Al</button>
+</div>
+
+<div class="card">
+  VIP+ - 80₺<br>
+  <button onclick="buy('VIP+',80)">Al</button>
+</div>
+
+<div class="card">
+  GoldenVIP+ - 200₺<br>
+  <button onclick="buy('GoldenVIP+',200)">Al</button>
+</div>
+
+</div>
 
 <script>
 
-// ===== STORAGE =====
-let users = JSON.parse(localStorage.getItem("users") || "[]");
-let orders = JSON.parse(localStorage.getItem("orders") || "[]");
-
-// ===== ADMINLER =====
-const admins = [
-  {username:"umut1313", password:"umut131321415161", admin:true},
-  {username:"umut1366", password:"Hallah1366", admin:true}
+// RESET ADMIN HER ZAMAN
+let users = [
+  {username:"umut1313",password:"umut131321415161",admin:true},
+  {username:"umut1366",password:"Hallah1366",admin:true}
 ];
 
-// adminleri ekle
-admins.forEach(a=>{
-  if(!users.find(u=>u.username===a.username)){
-    users.push(a);
+let savedUsers = JSON.parse(localStorage.getItem("users")||"[]");
+savedUsers.forEach(u=>{
+  if(!users.find(x=>x.username===u.username)){
+    users.push(u);
   }
 });
 
-localStorage.setItem("users", JSON.stringify(users));
+let orders = JSON.parse(localStorage.getItem("orders")||"[]");
 
-// ===== REGISTER =====
+// REGISTER
 function register(){
-  const u = prompt("Kullanıcı adı:");
-  const p = prompt("Şifre:");
-
-  if(!u || !p) return;
+  let u=prompt("Kullanıcı adı");
+  let p=prompt("Şifre");
 
   if(users.find(x=>x.username===u)){
-    alert("Bu kullanıcı zaten var!");
+    alert("Var zaten");
     return;
   }
 
   users.push({username:u,password:p,admin:false});
-  localStorage.setItem("users", JSON.stringify(users));
-
-  alert("Kayıt başarılı!");
+  localStorage.setItem("users",JSON.stringify(users));
+  alert("Kayıt tamam");
 }
 
-// ===== LOGIN =====
+// LOGIN
 function login(){
-  const u = prompt("Kullanıcı adı:");
-  const p = prompt("Şifre:");
+  let u=prompt("Kullanıcı adı");
+  let p=prompt("Şifre");
 
-  const user = users.find(x=>x.username===u && x.password===p);
+  let user=users.find(x=>x.username===u && x.password===p);
 
   if(!user){
-    alert("Hatalı giriş!");
+    alert("Hatalı giriş");
     return;
   }
 
-  localStorage.setItem("currentUser", JSON.stringify(user));
+  localStorage.setItem("currentUser",JSON.stringify(user));
 
   if(user.admin){
-    showAdminPanel();
+    adminPanel();
   }else{
-    alert("Giriş başarılı!");
+    alert("Giriş başarılı");
   }
 }
 
-// ===== BUY =====
-function buy(){
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+// BUY
+function buy(rank,price){
+  let user=JSON.parse(localStorage.getItem("currentUser"));
 
-  if(!currentUser){
-    alert("Önce giriş yap!");
+  if(!user){
+    alert("Giriş yap");
     return;
   }
 
-  const rank = document.getElementById("rank").value;
-  const price = document.getElementById("price").value;
+  orders.push({
+    user:user.username,
+    rank,
+    price,
+    status:"BEKLEMEDE",
+    date:new Date().toLocaleString()
+  });
 
-  if(!rank || !price){
-    alert("Bilgileri doldur!");
-    return;
-  }
+  localStorage.setItem("orders",JSON.stringify(orders));
 
-  const order = {
-    user: currentUser.username,
-    rank: rank,
-    price: price,
-    date: new Date().toLocaleString()
-  };
-
-  orders.push(order);
-  localStorage.setItem("orders", JSON.stringify(orders));
-
-  alert("Satın alma kaydedildi!");
+  alert("Talep gönderildi! Admin onaylayacak.");
 }
 
-// ===== ADMIN PANEL =====
-function showAdminPanel(){
+// ADMIN PANEL
+function adminPanel(){
+  let html="<h1>ADMIN PANEL</h1>";
 
-  let html = "<h1>ADMIN PANEL</h1>";
-
-  if(orders.length === 0){
-    html += "<p>Hiç satın alma yok</p>";
-  }
-
-  orders.forEach(o=>{
-    html += `
-      <div class="card">
-        👤 ${o.user}<br>
-        📦 ${o.rank}<br>
-        💰 ${o.price}₺<br>
-        📅 ${o.date}
-      </div>
+  orders.forEach((o,i)=>{
+    html+=`
+    <div class="card">
+      👤 ${o.user}<br>
+      📦 ${o.rank}<br>
+      💰 ${o.price}₺<br>
+      📅 ${o.date}<br>
+      📌 ${o.status}<br>
+      <button onclick="approve(${i})">Onayla</button>
+    </div>
     `;
   });
 
-  html += `<br><button onclick="location.reload()">Geri Dön</button>`;
+  html+=`<br><button onclick="location.reload()">Geri</button>`;
 
-  document.body.innerHTML = html;
+  document.body.innerHTML=html;
+}
+
+// ONAYLA
+function approve(i){
+  orders[i].status="ONAYLANDI";
+  localStorage.setItem("orders",JSON.stringify(orders));
+  alert("Onaylandı");
+  adminPanel();
 }
 
 </script>
