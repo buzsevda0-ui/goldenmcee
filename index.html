@@ -3,147 +3,266 @@
 <html lang="tr">
 <head>
 <meta charset="UTF-8">
-<title>GoldenMC</title>
+<title>GoldenMC PRO</title>
 
 <style>
-body{background:#0a0806;color:#FFD700;font-family:Arial;text-align:center}
-.container{max-width:800px;margin:auto}
-.card{background:#111;border:1px solid gold;padding:15px;margin:10px;border-radius:8px}
-button{padding:10px 15px;margin:5px;background:black;color:gold;border:1px solid gold;cursor:pointer}
-input{padding:8px;margin:5px;background:black;color:white;border:1px solid gold}
+body{
+  background:#0a0806;
+  color:#FFD700;
+  font-family:Arial;
+  text-align:center;
+}
+
+.container{max-width:900px;margin:auto}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  padding:10px;
+}
+
+.btn{
+  background:#111;
+  border:1px solid gold;
+  color:gold;
+  padding:10px 15px;
+  cursor:pointer;
+}
+
+.hidden{display:none}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:15px;
+  margin-top:20px;
+}
+
+.card{
+  background:#111;
+  border:1px solid gold;
+  padding:15px;
+  border-radius:10px;
+  transition:0.2s;
+}
+
+.card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 0 15px gold;
+}
+
+.price{
+  font-size:20px;
+  margin:10px 0;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.8);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.box{
+  background:#111;
+  padding:20px;
+  border:1px solid gold;
+}
+
+input{
+  display:block;
+  margin:10px auto;
+  padding:8px;
+  background:black;
+  color:white;
+  border:1px solid gold;
+}
 </style>
 
 </head>
 
 <body>
+
 <div class="container">
 
-<h1>GoldenMC Market</h1>
+<div class="top">
+  <h2>GoldenMC</h2>
+  <div id="authBtns">
+    <button class="btn" onclick="openLogin()">Giriş</button>
+    <button class="btn" onclick="openRegister()">Kayıt</button>
+  </div>
+</div>
 
-<button onclick="register()">Kayıt Ol</button> <button onclick="login()">Giriş Yap</button>
+<div id="market" class="hidden">
 
-<h2>VIP Paketler</h2>
+<h2>VIP Market</h2>
+
+<div class="grid">
 
 <div class="card">
-  VIP - 60₺<br>
-  <button onclick="buy('VIP',60)">Al</button>
+<h3>VIP</h3>
+<div class="price">60₺</div>
+<button class="btn" onclick="buy('VIP',60)">Satın Al</button>
 </div>
 
 <div class="card">
-  VIP+ - 80₺<br>
-  <button onclick="buy('VIP+',80)">Al</button>
+<h3>VIP+</h3>
+<div class="price">80₺</div>
+<button class="btn" onclick="buy('VIP+',80)">Satın Al</button>
 </div>
 
 <div class="card">
-  GoldenVIP+ - 200₺<br>
-  <button onclick="buy('GoldenVIP+',200)">Al</button>
+<h3>KVIP</h3>
+<div class="price">100₺</div>
+<button class="btn" onclick="buy('KVIP',100)">Satın Al</button>
 </div>
 
+<div class="card">
+<h3>KVIP+</h3>
+<div class="price">120₺</div>
+<button class="btn" onclick="buy('KVIP+',120)">Satın Al</button>
+</div>
+
+<div class="card">
+<h3>GoldenVIP</h3>
+<div class="price">160₺</div>
+<button class="btn" onclick="buy('GoldenVIP',160)">Satın Al</button>
+</div>
+
+<div class="card">
+<h3>GoldenVIP+</h3>
+<div class="price">200₺</div>
+<button class="btn" onclick="buy('GoldenVIP+',200)">Satın Al</button>
+</div>
+
+</div>
+</div>
+
+</div>
+
+<!-- MODAL -->
+
+<div id="modal" class="modal hidden">
+  <div class="box">
+    <h3 id="modalTitle"></h3>
+    <input id="username" placeholder="Kullanıcı">
+    <input id="password" placeholder="Şifre" type="password">
+    <button class="btn" onclick="submitAuth()">Devam</button>
+  </div>
 </div>
 
 <script>
 
-// RESET ADMIN HER ZAMAN
-let users = [
-  {username:"umut1313",password:"umut131321415161",admin:true},
-  {username:"umut1366",password:"Hallah1366",admin:true}
+// ADMIN
+const admins=[
+{username:"umut1313",password:"umut131321415161",admin:true},
+{username:"umut1366",password:"Hallah1366",admin:true}
 ];
 
-let savedUsers = JSON.parse(localStorage.getItem("users")||"[]");
-savedUsers.forEach(u=>{
-  if(!users.find(x=>x.username===u.username)){
-    users.push(u);
-  }
+let users=JSON.parse(localStorage.getItem("users")||"[]");
+let orders=JSON.parse(localStorage.getItem("orders")||"[]");
+
+// admin ekle
+admins.forEach(a=>{
+ if(!users.find(u=>u.username===a.username)){
+  users.push(a);
+ }
 });
 
-let orders = JSON.parse(localStorage.getItem("orders")||"[]");
+localStorage.setItem("users",JSON.stringify(users));
 
-// REGISTER
-function register(){
-  let u=prompt("Kullanıcı adı");
-  let p=prompt("Şifre");
+let mode="login";
 
+// MODAL
+function openLogin(){
+ mode="login";
+ document.getElementById("modalTitle").innerText="Giriş";
+ document.getElementById("modal").classList.remove("hidden");
+}
+
+function openRegister(){
+ mode="register";
+ document.getElementById("modalTitle").innerText="Kayıt";
+ document.getElementById("modal").classList.remove("hidden");
+}
+
+function submitAuth(){
+ let u=document.getElementById("username").value;
+ let p=document.getElementById("password").value;
+
+ if(mode==="register"){
   if(users.find(x=>x.username===u)){
-    alert("Var zaten");
-    return;
+   alert("Var zaten"); return;
   }
-
   users.push({username:u,password:p,admin:false});
   localStorage.setItem("users",JSON.stringify(users));
   alert("Kayıt tamam");
-}
+ }
 
-// LOGIN
-function login(){
-  let u=prompt("Kullanıcı adı");
-  let p=prompt("Şifre");
-
+ if(mode==="login"){
   let user=users.find(x=>x.username===u && x.password===p);
-
-  if(!user){
-    alert("Hatalı giriş");
-    return;
-  }
+  if(!user){alert("Hatalı");return;}
 
   localStorage.setItem("currentUser",JSON.stringify(user));
 
-  if(user.admin){
-    adminPanel();
-  }else{
-    alert("Giriş başarılı");
-  }
+  document.getElementById("authBtns").classList.add("hidden");
+  document.getElementById("market").classList.remove("hidden");
+  document.getElementById("modal").classList.add("hidden");
+
+  if(user.admin) adminPanel();
+ }
 }
 
 // BUY
 function buy(rank,price){
-  let user=JSON.parse(localStorage.getItem("currentUser"));
+ let user=JSON.parse(localStorage.getItem("currentUser"));
+ if(!user){alert("Giriş yap");return;}
 
-  if(!user){
-    alert("Giriş yap");
-    return;
-  }
+ alert("Paycell / IBAN: 5555 555 55\nAçıklama: "+user.username);
 
-  orders.push({
-    user:user.username,
-    rank,
-    price,
-    status:"BEKLEMEDE",
-    date:new Date().toLocaleString()
-  });
+ if(!confirm("Ödemeyi yaptım")) return;
 
-  localStorage.setItem("orders",JSON.stringify(orders));
+ orders.push({
+  user:user.username,
+  rank,
+  price,
+  status:"BEKLEMEDE",
+  date:new Date().toLocaleString()
+ });
 
-  alert("Talep gönderildi! Admin onaylayacak.");
+ localStorage.setItem("orders",JSON.stringify(orders));
+
+ alert("Talep gönderildi");
 }
 
 // ADMIN PANEL
 function adminPanel(){
-  let html="<h1>ADMIN PANEL</h1>";
+ let html="<h1>ADMIN PANEL</h1>";
 
-  orders.forEach((o,i)=>{
-    html+=`
-    <div class="card">
-      👤 ${o.user}<br>
-      📦 ${o.rank}<br>
-      💰 ${o.price}₺<br>
-      📅 ${o.date}<br>
-      📌 ${o.status}<br>
-      <button onclick="approve(${i})">Onayla</button>
-    </div>
-    `;
-  });
+ orders.forEach((o,i)=>{
+  html+=`
+  <div class="card">
+  ${o.user}<br>
+  ${o.rank}<br>
+  ${o.price}₺<br>
+  ${o.status}<br>
+  <button onclick="approve(${i})">ONAYLA</button>
+  </div>
+  `;
+ });
 
-  html+=`<br><button onclick="location.reload()">Geri</button>`;
+ html+=`<button onclick="location.reload()">Çık</button>`;
 
-  document.body.innerHTML=html;
+ document.body.innerHTML=html;
 }
 
-// ONAYLA
 function approve(i){
-  orders[i].status="ONAYLANDI";
-  localStorage.setItem("orders",JSON.stringify(orders));
-  alert("Onaylandı");
-  adminPanel();
+ orders[i].status="ONAYLANDI";
+ localStorage.setItem("orders",JSON.stringify(orders));
+ alert("VIP VER!");
+ adminPanel();
 }
 
 </script>
