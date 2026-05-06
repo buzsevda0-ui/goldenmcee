@@ -1,25 +1,35 @@
-const express = require("express");
-const { Rcon } = require("rcon-client");
+function startPayment(){
+  const username=document.getElementById('payUsername').value.trim();
+  const email=document.getElementById('payEmail').value.trim();
 
-const app = express();
-app.use(express.json());
+  if(!username){
+    showToast('⚠ Kullanıcı adı gir');
+    return;
+  }
 
-const rconConfig = {
-    host: "BURAYA_IP_YAZ", // ÖRN: node123.falixsrv.me
-    port: 25575,
-    password: "goldenmc2025"
-};
+  if(!email || !email.includes('@')){
+    showToast('⚠ Geçerli e-posta gir');
+    return;
+  }
 
-app.post("/cmd", async (req, res) => {
-    try {
-        const rcon = await Rcon.connect(rconConfig);
-        const result = await rcon.send(req.body.command);
-        await rcon.end();
+  // SENİN PAYCELL / IBAN / DC
+  const mesaj = `
+VIP Satın Alma Talebi
 
-        res.json({ result });
-    } catch (err) {
-        res.json({ error: err.message });
-    }
-});
+Kullanıcı: ${username}
+E-posta: ${email}
+Paket: ${currentRank}
+Fiyat: ${currentPrice}₺
+  `;
 
-app.listen(3000, () => console.log("Çalışıyor"));
+  // Discord webhook (önerilir)
+  fetch("BURAYA_DISCORD_WEBHOOK", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({content: mesaj})
+  });
+
+  showToast("✓ Talep gönderildi! Ödeme için Discord / Paycell ile iletişime geç");
+
+  document.getElementById('modalOverlay').classList.remove('open');
+}
