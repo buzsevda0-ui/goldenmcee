@@ -42,7 +42,7 @@ input{
 <button onclick="register()">Kayıt Ol</button> <button onclick="login()">Giriş Yap</button>
 
 <h2>VIP Satın Al</h2>
-<input id="rank" placeholder="VIP adı (VIP, VIP+, KVIP...)">
+<input id="rank" placeholder="VIP adı">
 <input id="price" placeholder="Fiyat">
 <br>
 <button onclick="buy()">Satın Al</button>
@@ -53,13 +53,19 @@ input{
 let users = JSON.parse(localStorage.getItem("users") || "[]");
 let orders = JSON.parse(localStorage.getItem("orders") || "[]");
 
-// default adminler
-if(!users.find(u=>u.username==="umut1313")){
-  users.push({username:"umut1313", password:"13132141", admin:true});
-}
-if(!users.find(u=>u.username==="umut1366")){
-  users.push({username:"umut1366", password:"Hallah1366", admin:true});
-}
+// ===== ADMINLER =====
+const admins = [
+  {username:"umut1313", password:"umut131321415161", admin:true},
+  {username:"umut1366", password:"Hallah1366", admin:true}
+];
+
+// adminleri ekle
+admins.forEach(a=>{
+  if(!users.find(u=>u.username===a.username)){
+    users.push(a);
+  }
+});
+
 localStorage.setItem("users", JSON.stringify(users));
 
 // ===== REGISTER =====
@@ -133,6 +139,7 @@ function buy(){
 
 // ===== ADMIN PANEL =====
 function showAdminPanel(){
+
   let html = "<h1>ADMIN PANEL</h1>";
 
   if(orders.length === 0){
