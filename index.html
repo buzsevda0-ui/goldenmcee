@@ -1,271 +1,798 @@
-<!DOCTYPE html>
-
-<html lang="tr">
-<head>
-<meta charset="UTF-8">
-<title>GoldenMC PRO</title>
-
 <style>
-body{
-  background:#0a0806;
-  color:#FFD700;
-  font-family:Arial;
-  text-align:center;
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#FFD700;--gold2:#FFA500;--dark:#0a0806;--dark2:#12100e;--dark3:#1c1a15;
+  --text:#e8d9a0;--muted:#7a6a40;--green:#4ade80;--red:#f87171;--blue:#60a5fa;
 }
+body{background:var(--dark);color:var(--text);font-family:'Segoe UI',sans-serif;font-size:15px;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:repeating-linear-gradient(0deg,transparent,transparent 39px,rgba(255,215,0,0.015) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,rgba(255,215,0,0.015) 40px);pointer-events:none}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
 
-.container{max-width:900px;margin:auto}
+/* NAV */
+nav{display:flex;justify-content:space-between;align-items:center;padding:0.75rem 1.5rem;border-bottom:1px solid rgba(255,215,0,0.12);background:rgba(10,8,6,0.97);position:sticky;top:0;z-index:200;gap:1rem}
+.nav-logo{font-size:1.1rem;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.nav-links{display:flex;gap:1.5rem;align-items:center}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:0.78rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:color 0.2s}
+.nav-links a:hover{color:var(--gold)}
+.nav-right{display:flex;gap:0.5rem;align-items:center}
+.btn-sm{padding:0.35rem 0.85rem;border-radius:4px;font-size:0.75rem;font-weight:700;letter-spacing:1px;cursor:pointer;border:none;font-family:inherit;transition:all 0.2s}
+.btn-gold{background:linear-gradient(135deg,#FFD700,#FFA500);color:#0a0806}
+.btn-outline-gold{background:transparent;border:1px solid rgba(255,215,0,0.35);color:var(--gold)}
+.btn-outline-gold:hover{background:rgba(255,215,0,0.1)}
+.user-pill{display:flex;align-items:center;gap:0.5rem;background:rgba(255,215,0,0.07);border:1px solid rgba(255,215,0,0.2);border-radius:20px;padding:0.25rem 0.75rem 0.25rem 0.4rem;font-size:0.78rem;color:var(--gold);cursor:pointer}
+.user-av{width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FFA500);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:800;color:#0a0806}
+.badge-admin{background:#7F77DD;color:#fff;font-size:0.6rem;padding:1px 5px;border-radius:3px;margin-left:3px;font-weight:700}
+.badge-mod{background:#0F6E56;color:#9FE1CB;font-size:0.6rem;padding:1px 5px;border-radius:3px;margin-left:3px;font-weight:700}
 
-.top{
-  display:flex;
-  justify-content:space-between;
-  padding:10px;
-}
+/* PAGES */
+.page{display:none;flex:1}
+.page.active{display:block}
 
-.btn{
-  background:#111;
-  border:1px solid gold;
-  color:gold;
-  padding:10px 15px;
-  cursor:pointer;
-}
+/* HERO */
+.hero{text-align:center;padding:4rem 2rem 3rem}
+.hero-tag{display:inline-block;background:rgba(255,160,0,0.1);border:1px solid rgba(255,160,0,0.25);color:#FFA500;font-size:0.7rem;letter-spacing:3px;padding:0.25rem 0.85rem;border-radius:2px;text-transform:uppercase;margin-bottom:1.25rem}
+.hero h1{font-size:clamp(2rem,7vw,4.5rem);font-weight:900;letter-spacing:4px;background:linear-gradient(135deg,#FFD700,#FFA500,#FFD700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.4rem;line-height:1}
+.hero-sub{font-size:0.75rem;letter-spacing:5px;color:var(--muted);margin-bottom:1.5rem}
+.hero-ip{display:inline-flex;align-items:center;gap:0.75rem;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.18);padding:0.6rem 1.25rem;border-radius:5px;cursor:pointer;margin-bottom:2rem;transition:all 0.2s}
+.hero-ip:hover{background:rgba(255,215,0,0.12);border-color:rgba(255,215,0,0.35)}
+.ip-addr{font-size:0.95rem;font-weight:700;color:var(--gold);letter-spacing:1px}
+.ip-copy{font-size:0.65rem;color:var(--muted);letter-spacing:1px}
+.hero-btns{display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap}
+.btn-hero{padding:0.65rem 1.75rem;border-radius:4px;font-size:0.8rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;font-family:inherit;transition:all 0.2s;text-decoration:none;display:inline-block}
+.btn-hero-main{background:linear-gradient(135deg,#FFD700,#FFA500);color:#0a0806}
+.btn-hero-main:hover{transform:translateY(-2px)}
+.btn-hero-sec{background:transparent;border:1px solid rgba(255,215,0,0.3);color:var(--gold)}
+.btn-hero-sec:hover{background:rgba(255,215,0,0.08);border-color:rgba(255,215,0,0.5)}
 
-.hidden{display:none}
+/* STATUS BAR */
+.status-bar{display:flex;justify-content:center;gap:2.5rem;padding:1.25rem;margin:0 2rem 3rem;border:1px solid rgba(255,215,0,0.12);border-radius:7px;background:rgba(255,215,0,0.025);flex-wrap:wrap}
+.stat{text-align:center}
+.stat-v{font-size:1.5rem;font-weight:800;color:var(--gold);display:block}
+.stat-l{font-size:0.65rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-  gap:15px;
-  margin-top:20px;
-}
+/* SECTION */
+.sec{padding:3rem 1.5rem;max-width:1100px;margin:0 auto}
+.sec-title{font-size:clamp(1.2rem,3.5vw,1.7rem);font-weight:800;text-align:center;margin-bottom:0.35rem;background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sec-sub{text-align:center;color:var(--muted);font-size:0.7rem;letter-spacing:2px;margin-bottom:2.5rem;text-transform:uppercase}
+.divider{width:50px;height:1px;background:var(--gold);margin:0.75rem auto 2.5rem;opacity:0.4}
 
-.card{
-  background:#111;
-  border:1px solid gold;
-  padding:15px;
-  border-radius:10px;
-  transition:0.2s;
-}
+/* VIP GRID */
+.vip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:0.9rem}
+.vc{background:rgba(255,215,0,0.035);border:1px solid rgba(255,215,0,0.12);border-radius:8px;padding:1.25rem 0.9rem;text-align:center;cursor:pointer;transition:all 0.25s;position:relative;overflow:hidden}
+.vc:hover{background:rgba(255,215,0,0.07);border-color:rgba(255,215,0,0.35);transform:translateY(-3px)}
+.vc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity 0.3s}
+.vc:hover::before{opacity:1}
+.vc-tag{font-size:0.58rem;letter-spacing:1.5px;font-weight:700;padding:0.18rem 0.55rem;border-radius:2px;display:inline-block;margin-bottom:0.6rem;text-transform:uppercase}
+.tag-vip{background:rgba(255,215,0,0.2);color:#FFD700}
+.tag-kvip{background:rgba(96,165,250,0.2);color:#60a5fa}
+.tag-gvip{background:rgba(251,191,36,0.2);color:#fbbf24}
+.vc-name{font-weight:800;font-size:0.95rem;color:var(--gold);margin-bottom:0.4rem}
+.vc-price{font-size:1.9rem;font-weight:900;color:#fff;line-height:1}
+.vc-price span{font-size:0.8rem;color:var(--muted)}
+.vc-perks{list-style:none;margin:0.85rem 0;text-align:left}
+.vc-perks li{font-size:0.75rem;color:#9a8a60;padding:0.2rem 0 0.2rem 1rem;position:relative}
+.vc-perks li::before{content:'◆';position:absolute;left:0;font-size:0.45rem;color:rgba(255,215,0,0.4);top:0.32rem}
+.vc-buy{width:100%;background:rgba(255,215,0,0.1);border:1px solid rgba(255,215,0,0.25);color:var(--gold);padding:0.5rem;border-radius:4px;font-weight:700;font-size:0.72rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:inherit;transition:all 0.2s;margin-top:0.35rem}
+.vc-buy:hover{background:rgba(255,215,0,0.22)}
 
-.card:hover{
-  transform:translateY(-5px);
-  box-shadow:0 0 15px gold;
-}
+/* FEATURES */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.1rem}
+.feat-card{background:rgba(255,255,255,0.018);border:1px solid rgba(255,215,0,0.08);border-radius:7px;padding:1.25rem;transition:border-color 0.3s}
+.feat-card:hover{border-color:rgba(255,215,0,0.25)}
+.feat-icon{font-size:1.5rem;margin-bottom:0.6rem}
+.feat-title{font-weight:700;color:var(--gold);margin-bottom:0.35rem;font-size:0.9rem}
+.feat-desc{font-size:0.8rem;color:var(--muted);line-height:1.5}
 
-.price{
-  font-size:20px;
-  margin:10px 0;
-}
+/* RULES */
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0.85rem}
+.rule{display:flex;gap:0.85rem;background:rgba(255,255,255,0.016);border:1px solid rgba(255,215,0,0.07);border-radius:6px;padding:0.9rem}
+.rule-n{font-size:1.3rem;font-weight:900;color:rgba(255,215,0,0.18);line-height:1;min-width:1.8rem}
+.rule-title{color:var(--text);font-weight:700;margin-bottom:0.2rem;font-size:0.85rem}
+.rule-desc{font-size:0.78rem;color:var(--muted);line-height:1.4}
 
-.modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.8);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+/* JOIN STEPS */
+.steps{display:flex;gap:0;flex-wrap:wrap;justify-content:center}
+.step{flex:1;min-width:160px;max-width:200px;text-align:center;padding:1.25rem 0.75rem;position:relative}
+.step:not(:last-child)::after{content:'→';position:absolute;right:-8px;top:50%;transform:translateY(-50%);color:var(--muted)}
+.step-num{width:44px;height:44px;border-radius:50%;border:2px solid rgba(255,215,0,0.25);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;font-weight:800;color:var(--gold);font-size:1rem}
+.step-title{font-weight:700;color:var(--gold);margin-bottom:0.3rem;font-size:0.85rem}
+.step-desc{font-size:0.75rem;color:var(--muted);line-height:1.4}
 
-.box{
-  background:#111;
-  padding:20px;
-  border:1px solid gold;
-}
+/* PAYMENT METHOD TABS */
+.pay-tabs{display:flex;gap:0.5rem;margin-bottom:1.25rem;background:rgba(0,0,0,0.3);border-radius:6px;padding:4px}
+.pay-tab{flex:1;padding:0.5rem;border:none;background:transparent;color:var(--muted);font-weight:700;font-size:0.78rem;cursor:pointer;border-radius:4px;font-family:inherit;transition:all 0.2s;letter-spacing:1px}
+.pay-tab.active{background:rgba(255,215,0,0.15);color:var(--gold);border:1px solid rgba(255,215,0,0.25)}
 
-input{
-  display:block;
-  margin:10px auto;
-  padding:8px;
-  background:black;
-  color:white;
-  border:1px solid gold;
-}
+/* MODALS (in-flow) */
+.modal-wrap{position:fixed;inset:0;background:rgba(0,0,0,0.82);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.modal-wrap.open{display:flex}
+.modal{background:var(--dark3);border:1px solid rgba(255,215,0,0.25);border-radius:10px;padding:1.75rem;width:100%;max-width:400px;max-height:90vh;overflow-y:auto;position:relative}
+.modal-close{position:absolute;top:0.75rem;right:0.9rem;background:none;border:none;color:var(--muted);font-size:1rem;cursor:pointer}
+.modal h3{font-size:1rem;font-weight:800;color:var(--gold);margin-bottom:1.25rem;letter-spacing:1px}
+.form-group{margin-bottom:0.9rem}
+.form-label{font-size:0.7rem;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:0.35rem;text-transform:uppercase}
+.form-input{width:100%;background:rgba(0,0,0,0.5);border:1px solid rgba(255,215,0,0.18);color:var(--text);padding:0.6rem 0.9rem;border-radius:4px;font-family:inherit;font-size:0.9rem;outline:none;transition:border-color 0.2s}
+.form-input:focus{border-color:var(--gold)}
+.modal-total{background:rgba(255,215,0,0.05);border:1px solid rgba(255,215,0,0.18);border-radius:4px;padding:0.65rem 0.9rem;display:flex;justify-content:space-between;align-items:center;margin:0.85rem 0}
+.modal-total-val{font-weight:800;color:var(--gold);font-size:1rem}
+.btn-full{width:100%;padding:0.65rem;border-radius:4px;font-size:0.8rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;border:none;font-family:inherit;transition:all 0.2s;background:linear-gradient(135deg,#FFD700,#FFA500);color:#0a0806;margin-top:0.5rem}
+.btn-full:hover{opacity:0.9}
+.paycell-info{background:rgba(96,165,250,0.07);border:1px solid rgba(96,165,250,0.2);border-radius:5px;padding:0.75rem;margin-top:0.75rem}
+.paycell-info p{font-size:0.75rem;color:#93c5fd;line-height:1.5}
+.paycell-num{font-size:1.1rem;font-weight:800;color:#60a5fa;letter-spacing:2px;display:block;margin-top:0.3rem}
+.paycell-desc{font-size:0.7rem;color:var(--muted);margin-top:0.5rem}
+
+/* AUTH PAGES */
+.auth-wrap{min-height:80vh;display:flex;align-items:center;justify-content:center;padding:2rem}
+.auth-card{background:var(--dark3);border:1px solid rgba(255,215,0,0.2);border-radius:10px;padding:2rem;width:100%;max-width:380px}
+.auth-title{font-size:1.2rem;font-weight:800;color:var(--gold);margin-bottom:0.35rem;letter-spacing:2px}
+.auth-sub{font-size:0.78rem;color:var(--muted);margin-bottom:1.75rem}
+.auth-tabs{display:flex;gap:0;margin-bottom:1.5rem;border:1px solid rgba(255,215,0,0.15);border-radius:5px;overflow:hidden}
+.auth-tab{flex:1;padding:0.55rem;border:none;background:transparent;color:var(--muted);font-weight:700;font-size:0.78rem;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.auth-tab.active{background:rgba(255,215,0,0.12);color:var(--gold)}
+.err{color:#f87171;font-size:0.75rem;margin-top:-0.5rem;margin-bottom:0.5rem;display:none}
+.err.show{display:block}
+.success-msg{color:var(--green);font-size:0.75rem;margin-top:0.5rem;display:none}
+.success-msg.show{display:block}
+.forgot-link{font-size:0.72rem;color:var(--muted);cursor:pointer;float:right;margin-top:-0.5rem}
+.forgot-link:hover{color:var(--gold)}
+
+/* USER PROFILE */
+.profile-card{background:var(--dark3);border:1px solid rgba(255,215,0,0.15);border-radius:10px;padding:1.5rem;max-width:500px;margin:0 auto}
+.profile-av{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FFA500);display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:900;color:#0a0806;margin:0 auto 1rem}
+.profile-name{text-align:center;font-size:1.1rem;font-weight:800;color:var(--gold);margin-bottom:0.2rem}
+.profile-rank{text-align:center;font-size:0.75rem;color:var(--muted);margin-bottom:1.25rem;letter-spacing:1px}
+.profile-field{display:flex;justify-content:space-between;align-items:center;padding:0.6rem 0;border-bottom:1px solid rgba(255,215,0,0.06);font-size:0.85rem}
+.profile-field:last-child{border-bottom:none}
+.pf-label{color:var(--muted)}
+.pf-val{color:var(--text);font-weight:600}
+.rank-badge{display:inline-block;padding:0.2rem 0.6rem;border-radius:3px;font-size:0.7rem;font-weight:700;letter-spacing:1px}
+.rb-uye{background:rgba(255,255,255,0.1);color:#aaa}
+.rb-vip{background:rgba(255,215,0,0.15);color:#FFD700}
+.rb-kvip{background:rgba(96,165,250,0.15);color:#60a5fa}
+.rb-gvip{background:rgba(251,191,36,0.2);color:#fbbf24}
+.btn-danger{background:rgba(248,113,113,0.12);border:1px solid rgba(248,113,113,0.25);color:#f87171;padding:0.55rem 1.25rem;border-radius:4px;cursor:pointer;font-size:0.78rem;font-weight:700;font-family:inherit;transition:all 0.2s;margin-top:1rem;width:100%}
+.btn-danger:hover{background:rgba(248,113,113,0.22)}
+
+/* ADMIN PANEL */
+.admin-wrap{max-width:1000px;margin:0 auto;padding:1.5rem}
+.admin-header{display:flex;align-items:center;gap:1rem;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid rgba(255,215,0,0.12)}
+.admin-icon{width:44px;height:44px;border-radius:8px;background:rgba(127,119,221,0.15);border:1px solid rgba(127,119,221,0.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.admin-title{font-size:1.2rem;font-weight:800;color:var(--gold)}
+.admin-subtitle{font-size:0.75rem;color:var(--muted)}
+.admin-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.75rem;margin-bottom:2rem}
+.ast{background:rgba(255,215,0,0.04);border:1px solid rgba(255,215,0,0.1);border-radius:7px;padding:1rem;text-align:center}
+.ast-v{font-size:1.6rem;font-weight:900;color:var(--gold)}
+.ast-l{font-size:0.65rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:0.2rem}
+.admin-section{margin-bottom:2rem}
+.admin-section-title{font-size:0.8rem;font-weight:700;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:0.9rem;display:flex;align-items:center;gap:0.5rem}
+.orders-table{width:100%;border-collapse:collapse;font-size:0.82rem}
+.orders-table th{text-align:left;padding:0.5rem 0.75rem;color:var(--muted);font-size:0.68rem;letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid rgba(255,215,0,0.1);font-weight:600}
+.orders-table td{padding:0.6rem 0.75rem;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--text);vertical-align:middle}
+.orders-table tr:hover td{background:rgba(255,215,0,0.025)}
+.status-pill{display:inline-block;padding:0.18rem 0.55rem;border-radius:3px;font-size:0.65rem;font-weight:700;letter-spacing:0.5px}
+.sp-pending{background:rgba(251,191,36,0.15);color:#fbbf24}
+.sp-approved{background:rgba(74,222,128,0.15);color:#4ade80}
+.sp-rejected{background:rgba(248,113,113,0.15);color:#f87171}
+.sp-paid{background:rgba(96,165,250,0.15);color:#60a5fa}
+.action-btns{display:flex;gap:0.4rem}
+.ab{padding:0.25rem 0.6rem;border-radius:3px;font-size:0.68rem;font-weight:700;cursor:pointer;border:none;font-family:inherit;transition:all 0.2s}
+.ab-approve{background:rgba(74,222,128,0.15);color:#4ade80;border:1px solid rgba(74,222,128,0.25)}
+.ab-reject{background:rgba(248,113,113,0.12);color:#f87171;border:1px solid rgba(248,113,113,0.2)}
+.ab-pay{background:rgba(96,165,250,0.12);color:#60a5fa;border:1px solid rgba(96,165,250,0.2)}
+.ab-rank{background:rgba(255,215,0,0.1);color:#FFD700;border:1px solid rgba(255,215,0,0.2)}
+.ab:hover{opacity:0.8;transform:scale(0.97)}
+.rank-sel{background:rgba(0,0,0,0.4);border:1px solid rgba(255,215,0,0.2);color:var(--text);padding:0.25rem 0.5rem;border-radius:3px;font-size:0.72rem;font-family:inherit;cursor:pointer;outline:none}
+.rank-sel option{background:var(--dark)}
+.users-list{display:grid;gap:0.6rem}
+.user-row{display:flex;align-items:center;gap:0.75rem;background:rgba(255,255,255,0.018);border:1px solid rgba(255,215,0,0.07);border-radius:6px;padding:0.65rem 0.9rem}
+.user-av-sm{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#FFD700,#FFA500);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:800;color:#0a0806;flex-shrink:0}
+.user-info{flex:1}
+.user-name{font-weight:700;font-size:0.88rem;color:var(--text)}
+.user-meta{font-size:0.72rem;color:var(--muted)}
+.inline-rank{background:rgba(0,0,0,0.4);border:1px solid rgba(255,215,0,0.2);color:var(--text);padding:0.2rem 0.4rem;border-radius:3px;font-size:0.72rem;font-family:inherit;cursor:pointer;outline:none}
+.inline-rank option{background:var(--dark)}
+
+/* NOTIFICATIONS */
+.notif{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dark3);border:1px solid rgba(255,215,0,0.3);color:var(--gold);padding:0.6rem 1.25rem;border-radius:5px;font-weight:700;font-size:0.82rem;letter-spacing:1px;z-index:9999;transition:transform 0.3s;white-space:nowrap;max-width:90vw;text-align:center}
+.notif.show{transform:translateX(-50%) translateY(0)}
+.notif.error{border-color:rgba(248,113,113,0.4);color:#f87171}
+.notif.success{border-color:rgba(74,222,128,0.4);color:#4ade80}
+
+/* FOOTER */
+footer{border-top:1px solid rgba(255,215,0,0.08);padding:1.5rem;text-align:center;color:var(--muted);font-size:0.75rem;margin-top:auto}
+.foot-logo{font-size:1rem;font-weight:800;letter-spacing:2px;background:linear-gradient(135deg,#FFD700,#FFA500);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:0.35rem}
+
+.sep{width:1px;height:20px;background:rgba(255,215,0,0.1)}
 </style>
 
-</head>
+<div class="app" id="app">
 
-<body>
+<nav>
+  <div class="nav-logo">⚔ GOLDENMCEE</div>
+  <div class="nav-links">
+    <a onclick="showPage('home')">Ana Sayfa</a>
+    <a onclick="showPage('market')">Market</a>
+    <a onclick="showPage('features')">Özellikler</a>
+    <a onclick="showPage('join')">Katıl</a>
+  </div>
+  <div class="nav-right" id="navRight">
+    <button class="btn-sm btn-outline-gold" onclick="showPage('login')">Giriş</button>
+    <button class="btn-sm btn-gold" onclick="showPage('register')">Kayıt</button>
+  </div>
+</nav>
 
-<div class="container">
+<!-- HOME PAGE -->
+<div class="page active" id="page-home">
+  <header class="hero">
+    <div class="hero-tag">⚡ Survival · Economy · PvP · Minigames</div>
+    <h1>GOLDENMCEE</h1>
+    <p class="hero-sub">TÜRK MİNECRAFT SUNUCUSU</p>
+    <div class="hero-ip" onclick="copyIP()">
+      <span class="ip-addr">goldenmcee.falixsvr.me</span>
+      <span class="ip-copy">▤ KOPYALA</span>
+    </div>
+    <div class="hero-btns">
+      <button class="btn-hero btn-hero-main" onclick="showPage('market')">🏆 VIP Satın Al</button>
+      <button class="btn-hero btn-hero-sec" onclick="showPage('join')">Nasıl Katılırım?</button>
+    </div>
+  </header>
 
-<div class="top">
-  <h2>GoldenMC</h2>
-  <div id="authBtns">
-    <button class="btn" onclick="openLogin()">Giriş</button>
-    <button class="btn" onclick="openRegister()">Kayıt</button>
+  <div style="max-width:900px;margin:0 auto;padding:0 1.5rem">
+    <div class="status-bar">
+      <div class="stat"><span class="stat-v"><span class="dot"></span>Aktif</span><span class="stat-l">Sunucu</span></div>
+      <div class="stat"><span class="stat-v" id="onlinePlayers">—</span><span class="stat-l">Oyuncu</span></div>
+      <div class="stat"><span class="stat-v">Java</span><span class="stat-l">Tür</span></div>
+      <div class="stat"><span class="stat-v">1.8+</span><span class="stat-l">Sürüm</span></div>
+      <div class="stat"><span class="stat-v">7/24</span><span class="stat-l">Uptime</span></div>
+    </div>
+  </div>
+
+  <div class="sec" style="padding-top:1rem">
+    <h2 class="sec-title">Öne Çıkan VIP Paketler</h2>
+    <div class="divider"></div>
+    <div class="vip-grid" style="grid-template-columns:repeat(auto-fit,minmax(155px,1fr))">
+      <div class="vc" onclick="openBuy('VIP',60)"><span class="vc-tag tag-vip">Başlangıç</span><div class="vc-name">VIP</div><div class="vc-price">60<span> ₺</span></div><ul class="vc-perks"><li>/fly komutu</li><li>Özel önek</li><li>3 ev seti</li></ul><button class="vc-buy">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('VIP+',80)"><span class="vc-tag tag-vip">Popüler</span><div class="vc-name">VIP+</div><div class="vc-price">80<span> ₺</span></div><ul class="vc-perks"><li>/fly + /speed</li><li>Renkli sohbet</li><li>5 ev seti</li></ul><button class="vc-buy">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('KVIP',100)" style="border-color:rgba(96,165,250,0.25)"><span class="vc-tag tag-kvip">Önerilen</span><div class="vc-name" style="color:#60a5fa">KVIP</div><div class="vc-price">100<span> ₺</span></div><ul class="vc-perks"><li>Particle efekt</li><li>/god modu</li><li>8 ev seti</li></ul><button class="vc-buy" style="border-color:rgba(96,165,250,0.3);color:#60a5fa">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('KVIP+',120)"><span class="vc-tag tag-kvip">Premium</span><div class="vc-name" style="color:#60a5fa">KVIP+</div><div class="vc-price">120<span> ₺</span></div><ul class="vc-perks"><li>/invsee</li><li>Özel mesaj</li><li>10 ev seti</li></ul><button class="vc-buy" style="border-color:rgba(96,165,250,0.3);color:#60a5fa">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('GoldenVIP',160)"><span class="vc-tag tag-gvip">Elite</span><div class="vc-name">GoldenVIP</div><div class="vc-price">160<span> ₺</span></div><ul class="vc-perks"><li>Altın efektler</li><li>Tüm komutlar</li><li>15 ev seti</li></ul><button class="vc-buy">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('GoldenVIP+',200)" style="border-color:rgba(255,215,0,0.35)"><span class="vc-tag tag-gvip">⭐ En İyi</span><div class="vc-name">GoldenVIP+</div><div class="vc-price">200<span> ₺</span></div><ul class="vc-perks"><li>Giriş animasyon</li><li>Sınırsız XP</li><li>Sınırsız ev</li></ul><button class="vc-buy">Satın Al</button></div>
+    </div>
   </div>
 </div>
 
-<div id="market" class="hidden">
-
-<h2>VIP Market</h2>
-
-<div class="grid">
-
-<div class="card">
-<h3>VIP</h3>
-<div class="price">60₺</div>
-<button class="btn" onclick="buy('VIP',60)">Satın Al</button>
-</div>
-
-<div class="card">
-<h3>VIP+</h3>
-<div class="price">80₺</div>
-<button class="btn" onclick="buy('VIP+',80)">Satın Al</button>
-</div>
-
-<div class="card">
-<h3>KVIP</h3>
-<div class="price">100₺</div>
-<button class="btn" onclick="buy('KVIP',100)">Satın Al</button>
-</div>
-
-<div class="card">
-<h3>KVIP+</h3>
-<div class="price">120₺</div>
-<button class="btn" onclick="buy('KVIP+',120)">Satın Al</button>
-</div>
-
-<div class="card">
-<h3>GoldenVIP</h3>
-<div class="price">160₺</div>
-<button class="btn" onclick="buy('GoldenVIP',160)">Satın Al</button>
-</div>
-
-<div class="card">
-<h3>GoldenVIP+</h3>
-<div class="price">200₺</div>
-<button class="btn" onclick="buy('GoldenVIP+',200)">Satın Al</button>
-</div>
-
-</div>
-</div>
-
-</div>
-
-<!-- MODAL -->
-
-<div id="modal" class="modal hidden">
-  <div class="box">
-    <h3 id="modalTitle"></h3>
-    <input id="username" placeholder="Kullanıcı">
-    <input id="password" placeholder="Şifre" type="password">
-    <button class="btn" onclick="submitAuth()">Devam</button>
+<!-- MARKET PAGE -->
+<div class="page" id="page-market">
+  <div class="sec">
+    <h2 class="sec-title">VIP Market</h2>
+    <p class="sec-sub">Rütbeni seç, avantajlarını kazan</p>
+    <div class="divider"></div>
+    <div class="vip-grid">
+      <div class="vc" onclick="openBuy('VIP',60)"><span class="vc-tag tag-vip">Başlangıç</span><div class="vc-name">VIP</div><div class="vc-price">60<span> ₺</span></div><ul class="vc-perks"><li>/fly komutu</li><li>Özel VIP öneki</li><li>Renkli sohbet</li><li>2x XP kasası</li><li>3 ev seti</li></ul><button class="vc-buy">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('VIP+',80)"><span class="vc-tag tag-vip">Popüler</span><div class="vc-name">VIP+</div><div class="vc-price">80<span> ₺</span></div><ul class="vc-perks"><li>/fly + /speed</li><li>Formatlanmış sohbet</li><li>3x XP kasası</li><li>5 ev seti</li><li>Özel tab rengi</li></ul><button class="vc-buy">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('KVIP',100)" style="border-color:rgba(96,165,250,0.25)"><span class="vc-tag tag-kvip">Önerilen</span><div class="vc-name" style="color:#60a5fa">KVIP</div><div class="vc-price">100<span> ₺</span></div><ul class="vc-perks"><li>Kral VIP öneki</li><li>Particle efekti</li><li>5x XP kasası</li><li>/god modu</li><li>8 ev seti</li></ul><button class="vc-buy" style="border-color:rgba(96,165,250,0.3);color:#60a5fa">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('KVIP+',120)"><span class="vc-tag tag-kvip">Premium</span><div class="vc-name" style="color:#60a5fa">KVIP+</div><div class="vc-price">120<span> ₺</span></div><ul class="vc-perks"><li>KVIP+ öneki</li><li>Özel join mesajı</li><li>7x XP kasası</li><li>/invsee komutu</li><li>10 ev seti</li></ul><button class="vc-buy" style="border-color:rgba(96,165,250,0.3);color:#60a5fa">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('GoldenVIP',160)"><span class="vc-tag tag-gvip">Elite</span><div class="vc-name">GoldenVIP</div><div class="vc-price">160<span> ₺</span></div><ul class="vc-perks"><li>Altın parlayan önek</li><li>Özel ölüm efekti</li><li>10x XP kasası</li><li>Tüm komutlar</li><li>15 ev seti</li></ul><button class="vc-buy">Satın Al</button></div>
+      <div class="vc" onclick="openBuy('GoldenVIP+',200)" style="border-color:rgba(255,215,0,0.35)"><span class="vc-tag tag-gvip">⭐ En İyi</span><div class="vc-name">GoldenVIP+</div><div class="vc-price">200<span> ₺</span></div><ul class="vc-perks"><li>Efsane altın önek</li><li>Özel giriş animasyon</li><li>Sınırsız XP kasası</li><li>Admin koridoru</li><li>Sınırsız ev seti</li></ul><button class="vc-buy">Satın Al</button></div>
+    </div>
   </div>
 </div>
+
+<!-- FEATURES PAGE -->
+<div class="page" id="page-features">
+  <div class="sec">
+    <h2 class="sec-title">Sunucu Özellikleri</h2>
+    <p class="sec-sub">GoldenMC'yi özel kılan nedir?</p>
+    <div class="divider"></div>
+    <div class="feat-grid">
+      <div class="feat-card"><div class="feat-icon">⚔️</div><div class="feat-title">PvP Arenaları</div><div class="feat-desc">Farklı temalı PvP alanlarında rakiplerinle kozunu paylaş.</div></div>
+      <div class="feat-card"><div class="feat-icon">🏰</div><div class="feat-title">Survival Modu</div><div class="feat-desc">Özenle dengeli survival deneyimi, griefing koruması ile.</div></div>
+      <div class="feat-card"><div class="feat-icon">💰</div><div class="feat-title">Ekonomi Sistemi</div><div class="feat-desc">Kendi işini kur, ticaret yap, zengin ol.</div></div>
+      <div class="feat-card"><div class="feat-icon">🎮</div><div class="feat-title">Minigames</div><div class="feat-desc">BedWars, SkyWars ve daha fazla mini oyun.</div></div>
+      <div class="feat-card"><div class="feat-icon">🌍</div><div class="feat-title">Özel Haritalar</div><div class="feat-desc">El yapımı, özel tasarım haritalar ve dünyalar.</div></div>
+      <div class="feat-card"><div class="feat-icon">👥</div><div class="feat-title">Aktif Topluluk</div><div class="feat-desc">Discord sunucumuzda her zaman aktif yöneticiler.</div></div>
+    </div>
+    <div style="margin-top:3rem">
+      <h2 class="sec-title">Sunucu Kuralları</h2>
+      <div class="divider"></div>
+      <div class="rules-grid">
+        <div class="rule"><div class="rule-n">01</div><div><div class="rule-title">Hile Yasaktır</div><div class="rule-desc">Her türlü hile yazılımı kullanımı kalıcı bana yol açar.</div></div></div>
+        <div class="rule"><div class="rule-n">02</div><div><div class="rule-title">Saygılı Ol</div><div class="rule-desc">Hakaret, küfür ve ırkçılık tolere edilmez.</div></div></div>
+        <div class="rule"><div class="rule-n">03</div><div><div class="rule-title">Reklam Yasak</div><div class="rule-desc">Başka sunucu reklamı yapmak kalıcı ban sebebidir.</div></div></div>
+        <div class="rule"><div class="rule-n">04</div><div><div class="rule-title">Spam Yapma</div><div class="rule-desc">Sohbette spam ve flood yapmak yasaktır.</div></div></div>
+        <div class="rule"><div class="rule-n">05</div><div><div class="rule-title">Griefing Yasak</div><div class="rule-desc">Başkasının inşaatını tahrip etmek yasaktır.</div></div></div>
+        <div class="rule"><div class="rule-n">06</div><div><div class="rule-title">Yetkililere Uy</div><div class="rule-desc">Moderatör kararlarına saygı göster.</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOIN PAGE -->
+<div class="page" id="page-join">
+  <div class="sec">
+    <h2 class="sec-title">Nasıl Katılırsın?</h2>
+    <p class="sec-sub">3 adımda GoldenMC'de oyna</p>
+    <div class="divider"></div>
+    <div class="steps">
+      <div class="step"><div class="step-num">1</div><div class="step-title">Minecraft Aç</div><div class="step-desc">Java Edition 1.8 veya üzeri.</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-title">Sunucu Ekle</div><div class="step-desc">Multiplayer → Add Server</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-title">IP Gir</div><div class="step-desc" style="color:var(--gold);font-weight:700;font-size:0.8rem">goldenmcee.falixsvr.me</div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-title">Oyna!</div><div class="step-desc">Hoş geldin ve maceraya başla!</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN PAGE -->
+<div class="page" id="page-login">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">⚔ GİRİŞ YAP</div>
+      <div class="auth-sub">GoldenMC hesabına giriş yap</div>
+      <div class="form-group">
+        <label class="form-label">Kullanıcı Adı</label>
+        <input type="text" class="form-input" id="loginUser" placeholder="Kullanıcı adın">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Şifre <span class="forgot-link" onclick="showToast('Şifre sıfırlama için Discord\'a yaz.','info')">Şifremi unuttum</span></label>
+        <input type="password" class="form-input" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="err" id="loginErr">Kullanıcı adı veya şifre hatalı.</div>
+      <button class="btn-full" onclick="doLogin()">Giriş Yap</button>
+      <p style="text-align:center;margin-top:1rem;font-size:0.78rem;color:var(--muted)">Hesabın yok mu? <a onclick="showPage('register')" style="color:var(--gold);cursor:pointer">Kayıt ol</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER PAGE -->
+<div class="page" id="page-register">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-title">⚔ KAYIT OL</div>
+      <div class="auth-sub">Yeni bir GoldenMC hesabı oluştur</div>
+      <div class="form-group">
+        <label class="form-label">Kullanıcı Adı</label>
+        <input type="text" class="form-input" id="regUser" placeholder="Kullanıcı adın">
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-posta</label>
+        <input type="email" class="form-input" id="regEmail" placeholder="email@ornek.com">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Şifre</label>
+        <input type="password" class="form-input" id="regPass" placeholder="En az 6 karakter">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Şifre Tekrar</label>
+        <input type="password" class="form-input" id="regPass2" placeholder="Şifreni tekrarla">
+      </div>
+      <div class="err" id="regErr"></div>
+      <button class="btn-full" onclick="doRegister()">Kayıt Ol</button>
+      <p style="text-align:center;margin-top:1rem;font-size:0.78rem;color:var(--muted)">Hesabın var mı? <a onclick="showPage('login')" style="color:var(--gold);cursor:pointer">Giriş yap</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- PROFILE PAGE -->
+<div class="page" id="page-profile">
+  <div class="sec" style="max-width:600px">
+    <h2 class="sec-title">Hesabım</h2>
+    <div class="divider"></div>
+    <div class="profile-card">
+      <div class="profile-av" id="profAv">U</div>
+      <div class="profile-name" id="profName">—</div>
+      <div class="profile-rank" id="profRankLabel">Üye</div>
+      <div class="profile-field"><span class="pf-label">Kullanıcı Adı</span><span class="pf-val" id="profUser">—</span></div>
+      <div class="profile-field"><span class="pf-label">E-posta</span><span class="pf-val" id="profEmail">—</span></div>
+      <div class="profile-field"><span class="pf-label">Rank</span><span class="pf-val"><span class="rank-badge rb-vip" id="profRankBadge">Üye</span></span></div>
+      <div class="profile-field"><span class="pf-label">Kayıt Tarihi</span><span class="pf-val" id="profDate">—</span></div>
+      <div class="profile-field"><span class="pf-label">Sipariş Sayısı</span><span class="pf-val" id="profOrders">0</span></div>
+      <button class="btn-danger" onclick="doLogout()">Çıkış Yap</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="page" id="page-admin">
+  <div class="admin-wrap">
+    <div class="admin-header">
+      <div class="admin-icon">👑</div>
+      <div><div class="admin-title">Admin Paneli</div><div class="admin-subtitle" id="adminWelcome">Hoş geldin</div></div>
+    </div>
+
+    <div class="admin-stats">
+      <div class="ast"><div class="ast-v" id="statTotal">0</div><div class="ast-l">Toplam Sipariş</div></div>
+      <div class="ast"><div class="ast-v" id="statPending" style="color:#fbbf24">0</div><div class="ast-l">Bekleyen</div></div>
+      <div class="ast"><div class="ast-v" id="statApproved" style="color:#4ade80">0</div><div class="ast-l">Onaylanan</div></div>
+      <div class="ast"><div class="ast-v" id="statRevenue" style="color:#60a5fa">0₺</div><div class="ast-l">Gelir</div></div>
+      <div class="ast"><div class="ast-v" id="statUsers">0</div><div class="ast-l">Kullanıcı</div></div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">📦 Siparişler & Ödemeler</div>
+      <div style="overflow-x:auto">
+        <table class="orders-table" id="ordersTable">
+          <thead><tr><th>Sipariş ID</th><th>Kullanıcı</th><th>Paket</th><th>Tutar</th><th>Ödeme</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr></thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-title">👥 Kullanıcılar & Rank Ata</div>
+      <div class="users-list" id="usersList"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MOD PANEL (umut1366) -->
+<div class="page" id="page-modpanel">
+  <div class="admin-wrap">
+    <div class="admin-header">
+      <div class="admin-icon">🛡️</div>
+      <div><div class="admin-title">Moderatör Paneli</div><div class="admin-subtitle">Sipariş yönetimi</div></div>
+    </div>
+    <div class="admin-stats">
+      <div class="ast"><div class="ast-v" id="modStatTotal">0</div><div class="ast-l">Toplam</div></div>
+      <div class="ast"><div class="ast-v" id="modStatPending" style="color:#fbbf24">0</div><div class="ast-l">Bekleyen</div></div>
+      <div class="ast"><div class="ast-v" id="modStatApproved" style="color:#4ade80">0</div><div class="ast-l">Onaylanan</div></div>
+    </div>
+    <div class="admin-section">
+      <div class="admin-section-title">📦 Siparişler</div>
+      <div style="overflow-x:auto">
+        <table class="orders-table">
+          <thead><tr><th>Sipariş ID</th><th>Kullanıcı</th><th>Paket</th><th>Tutar</th><th>Ödeme</th><th>Durum</th><th>Tarih</th><th>İşlem</th></tr></thead>
+          <tbody id="modOrdersBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- BUY MODAL -->
+<div class="modal-wrap" id="buyModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBuy()">✕</button>
+    <h3 id="buyTitle">VIP Satın Al</h3>
+    <div class="pay-tabs">
+      <button class="pay-tab active" onclick="setPayMethod('paytr',this)">💳 Kredi Kartı</button>
+      <button class="pay-tab" onclick="setPayMethod('paycell',this)">📱 Paycell</button>
+    </div>
+    <div id="paytrForm">
+      <div class="form-group">
+        <label class="form-label">Minecraft Kullanıcı Adı</label>
+        <input type="text" class="form-input" id="buyUser" placeholder="OyuncuAdın">
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-posta</label>
+        <input type="email" class="form-input" id="buyEmail" placeholder="ornek@email.com">
+      </div>
+      <div class="modal-total">
+        <span style="font-size:0.8rem;color:var(--muted)">PayTR ile güvenli ödeme</span>
+        <span class="modal-total-val" id="buyPrice">60 ₺</span>
+      </div>
+      <button class="btn-full" onclick="submitOrder('paytr')">💳 Ödemeyi Başlat</button>
+    </div>
+    <div id="paycellForm" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Minecraft Kullanıcı Adı</label>
+        <input type="text" class="form-input" id="buyUserPc" placeholder="OyuncuAdın">
+      </div>
+      <div class="form-group">
+        <label class="form-label">E-posta</label>
+        <input type="email" class="form-input" id="buyEmailPc" placeholder="ornek@email.com">
+      </div>
+      <div class="modal-total">
+        <span style="font-size:0.8rem;color:var(--muted)">Paycell ile ödeme</span>
+        <span class="modal-total-val" id="buyPricePc">60 ₺</span>
+      </div>
+      <div class="paycell-info">
+        <p>Aşağıdaki numaraya ödeme tutarını gönderin:</p>
+        <span class="paycell-num">0555 123 45 67</span>
+        <p class="paycell-desc">Açıklama kısmına kullanıcı adınızı ve aldığınız paketi yazın. Ödeme sonrası sipariş oluşturulur, yönetici onaylar.</p>
+      </div>
+      <button class="btn-full" onclick="submitOrder('paycell')" style="margin-top:0.75rem">📱 Sipariş Oluştur</button>
+    </div>
+    <p style="font-size:0.7rem;color:var(--muted);margin-top:0.75rem;text-align:center">Ödeme onaylandıktan sonra rank otomatik atanır.</p>
+  </div>
+</div>
+
+<!-- NOTIF -->
+<div class="notif" id="notif"></div>
 
 <script>
+const USERS_KEY='gmc_users';const ORDERS_KEY='gmc_orders';const SESSION_KEY='gmc_session';
 
-// ADMIN
-const admins=[
-{username:"umut1313",password:"umut131321415161",admin:true},
-{username:"umut1366",password:"Hallah1366",admin:true}
+const PRESET_USERS=[
+  {username:'umut1313',password:'umutum13132141',email:'umut1313@goldenmcee.com',rank:'GoldenVIP+',role:'admin',date:'2025-01-01'},
+  {username:'umut1366',password:'Hallah1366',email:'umut1366@goldenmcee.com',rank:'GoldenVIP+',role:'mod',date:'2025-01-01'}
 ];
 
-let users=JSON.parse(localStorage.getItem("users")||"[]");
-let orders=JSON.parse(localStorage.getItem("orders")||"[]");
-
-// admin ekle
-admins.forEach(a=>{
- if(!users.find(u=>u.username===a.username)){
-  users.push(a);
- }
-});
-
-localStorage.setItem("users",JSON.stringify(users));
-
-let mode="login";
-
-// MODAL
-function openLogin(){
- mode="login";
- document.getElementById("modalTitle").innerText="Giriş";
- document.getElementById("modal").classList.remove("hidden");
-}
-
-function openRegister(){
- mode="register";
- document.getElementById("modalTitle").innerText="Kayıt";
- document.getElementById("modal").classList.remove("hidden");
-}
-
-function submitAuth(){
- let u=document.getElementById("username").value;
- let p=document.getElementById("password").value;
-
- if(mode==="register"){
-  if(users.find(x=>x.username===u)){
-   alert("Var zaten"); return;
+function getUsers(){
+  const raw=localStorage.getItem(USERS_KEY);
+  if(!raw){
+    localStorage.setItem(USERS_KEY,JSON.stringify(PRESET_USERS));
+    return PRESET_USERS;
   }
-  users.push({username:u,password:p,admin:false});
-  localStorage.setItem("users",JSON.stringify(users));
-  alert("Kayıt tamam");
- }
+  let users=JSON.parse(raw);
+  for(const p of PRESET_USERS){
+    if(!users.find(u=>u.username===p.username)){users.push(p)}
+  }
+  return users;
+}
+function saveUsers(u){localStorage.setItem(USERS_KEY,JSON.stringify(u))}
+function getOrders(){const r=localStorage.getItem(ORDERS_KEY);return r?JSON.parse(r):[]}
+function saveOrders(o){localStorage.setItem(ORDERS_KEY,JSON.stringify(o))}
+function getSession(){const r=localStorage.getItem(SESSION_KEY);return r?JSON.parse(r):null}
+function setSession(u){localStorage.setItem(SESSION_KEY,JSON.stringify(u))}
+function clearSession(){localStorage.removeItem(SESSION_KEY)}
 
- if(mode==="login"){
-  let user=users.find(x=>x.username===u && x.password===p);
-  if(!user){alert("Hatalı");return;}
+let currentUser=getSession();
+let buyRank='',buyPriceVal=0,payMethod='paytr';
 
-  localStorage.setItem("currentUser",JSON.stringify(user));
-
-  document.getElementById("authBtns").classList.add("hidden");
-  document.getElementById("market").classList.remove("hidden");
-  document.getElementById("modal").classList.add("hidden");
-
-  if(user.admin) adminPanel();
- }
+function showPage(p){
+  document.querySelectorAll('.page').forEach(el=>el.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
 }
 
-// BUY
-function buy(rank,price){
- let user=JSON.parse(localStorage.getItem("currentUser"));
- if(!user){alert("Giriş yap");return;}
-
- alert("Paycell / IBAN: 5555 555 55\nAçıklama: "+user.username);
-
- if(!confirm("Ödemeyi yaptım")) return;
-
- orders.push({
-  user:user.username,
-  rank,
-  price,
-  status:"BEKLEMEDE",
-  date:new Date().toLocaleString()
- });
-
- localStorage.setItem("orders",JSON.stringify(orders));
-
- alert("Talep gönderildi");
+function updateNav(){
+  const nr=document.getElementById('navRight');
+  if(currentUser){
+    let badges='';
+    if(currentUser.role==='admin')badges+=`<span class="badge-admin">ADMİN</span>`;
+    if(currentUser.role==='mod')badges+=`<span class="badge-mod">MOD</span>`;
+    nr.innerHTML=`<div class="user-pill" onclick="goProfile()"><div class="user-av">${currentUser.username[0].toUpperCase()}</div>${currentUser.username}${badges}</div>`;
+  }else{
+    nr.innerHTML=`<button class="btn-sm btn-outline-gold" onclick="showPage('login')">Giriş</button><button class="btn-sm btn-gold" onclick="showPage('register')">Kayıt</button>`;
+  }
 }
 
-// ADMIN PANEL
-function adminPanel(){
- let html="<h1>ADMIN PANEL</h1>";
-
- orders.forEach((o,i)=>{
-  html+=`
-  <div class="card">
-  ${o.user}<br>
-  ${o.rank}<br>
-  ${o.price}₺<br>
-  ${o.status}<br>
-  <button onclick="approve(${i})">ONAYLA</button>
-  </div>
-  `;
- });
-
- html+=`<button onclick="location.reload()">Çık</button>`;
-
- document.body.innerHTML=html;
+function goProfile(){
+  if(!currentUser)return showPage('login');
+  updateProfile();
+  if(currentUser.role==='admin'){showPage('admin');renderAdmin();return;}
+  if(currentUser.role==='mod'){showPage('modpanel');renderModPanel();return;}
+  showPage('profile');
 }
 
-function approve(i){
- orders[i].status="ONAYLANDI";
- localStorage.setItem("orders",JSON.stringify(orders));
- alert("VIP VER!");
- adminPanel();
+function updateProfile(){
+  if(!currentUser)return;
+  document.getElementById('profAv').textContent=currentUser.username[0].toUpperCase();
+  document.getElementById('profName').textContent=currentUser.username;
+  document.getElementById('profUser').textContent=currentUser.username;
+  document.getElementById('profEmail').textContent=currentUser.email||'—';
+  document.getElementById('profDate').textContent=currentUser.date||'—';
+  const rank=currentUser.rank||'Üye';
+  document.getElementById('profRankLabel').textContent=rank;
+  const badge=document.getElementById('profRankBadge');
+  badge.textContent=rank;
+  badge.className='rank-badge '+(rank==='Üye'?'rb-uye':rank.includes('Golden')?'rb-gvip':rank.includes('KVIP')?'rb-kvip':'rb-vip');
+  const orders=getOrders().filter(o=>o.username===currentUser.username);
+  document.getElementById('profOrders').textContent=orders.length;
 }
 
+function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const users=getUsers();
+  const found=users.find(x=>x.username===u&&x.password===p);
+  const err=document.getElementById('loginErr');
+  if(!found){err.classList.add('show');return;}
+  err.classList.remove('show');
+  currentUser=found;setSession(found);updateNav();
+  showToast('Hoş geldin, '+found.username+'!','success');
+  if(found.role==='admin'){renderAdmin();showPage('admin')}
+  else if(found.role==='mod'){renderModPanel();showPage('modpanel')}
+  else{updateProfile();showPage('profile')}
+}
+
+function doRegister(){
+  const u=document.getElementById('regUser').value.trim();
+  const e=document.getElementById('regEmail').value.trim();
+  const p=document.getElementById('regPass').value;
+  const p2=document.getElementById('regPass2').value;
+  const err=document.getElementById('regErr');
+  if(!u||!e||!p){err.textContent='Tüm alanları doldur.';err.classList.add('show');return;}
+  if(p.length<6){err.textContent='Şifre en az 6 karakter olmalı.';err.classList.add('show');return;}
+  if(p!==p2){err.textContent='Şifreler eşleşmiyor.';err.classList.add('show');return;}
+  const users=getUsers();
+  if(users.find(x=>x.username===u)){err.textContent='Bu kullanıcı adı alınmış.';err.classList.add('show');return;}
+  const newUser={username:u,password:p,email:e,rank:'Üye',role:'user',date:new Date().toLocaleDateString('tr-TR')};
+  users.push(newUser);saveUsers(users);
+  err.classList.remove('show');
+  currentUser=newUser;setSession(newUser);updateNav();
+  showToast('Hesap oluşturuldu!','success');updateProfile();showPage('profile');
+}
+
+function doLogout(){clearSession();currentUser=null;updateNav();showPage('home');showToast('Çıkış yapıldı.','info')}
+
+function openBuy(rank,price){
+  if(!currentUser){showToast('Satın almak için giriş yap.','error');showPage('login');return;}
+  buyRank=rank;buyPriceVal=price;
+  document.getElementById('buyTitle').textContent=rank+' Satın Al';
+  document.getElementById('buyPrice').textContent=price+' ₺';
+  document.getElementById('buyPricePc').textContent=price+' ₺';
+  document.getElementById('buyUser').value=currentUser.username;
+  document.getElementById('buyEmail').value=currentUser.email||'';
+  document.getElementById('buyUserPc').value=currentUser.username;
+  document.getElementById('buyEmailPc').value=currentUser.email||'';
+  document.getElementById('buyModal').classList.add('open');
+}
+function closeBuy(){document.getElementById('buyModal').classList.remove('open')}
+function setPayMethod(m,btn){
+  payMethod=m;
+  document.querySelectorAll('.pay-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('paytrForm').style.display=m==='paytr'?'block':'none';
+  document.getElementById('paycellForm').style.display=m==='paycell'?'block':'none';
+}
+
+function submitOrder(method){
+  const uid=method==='paytr'?'buyUser':'buyUserPc';
+  const eid=method==='paytr'?'buyEmail':'buyEmailPc';
+  const username=document.getElementById(uid).value.trim();
+  const email=document.getElementById(eid).value.trim();
+  if(!username||!email){showToast('Tüm alanları doldur.','error');return;}
+  const orders=getOrders();
+  const orderId='GMC-'+Date.now()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+  const order={
+    id:orderId,username,email,
+    package:buyRank,price:buyPriceVal,
+    method:method==='paytr'?'Kredi Kartı':'Paycell',
+    status:'Bekliyor',
+    date:new Date().toLocaleString('tr-TR')
+  };
+  orders.push(order);saveOrders(orders);
+  closeBuy();
+  showToast('Siparişin oluşturuldu! #'+orderId,'success');
+}
+
+function renderAdmin(){
+  const orders=getOrders();
+  const users=getUsers();
+  document.getElementById('adminWelcome').textContent='Hoş geldin, '+currentUser.username;
+  document.getElementById('statTotal').textContent=orders.length;
+  document.getElementById('statPending').textContent=orders.filter(o=>o.status==='Bekliyor').length;
+  document.getElementById('statApproved').textContent=orders.filter(o=>o.status==='Onaylandı').length;
+  document.getElementById('statRevenue').textContent=orders.filter(o=>o.status==='Onaylandı').reduce((a,o)=>a+o.price,0)+'₺';
+  document.getElementById('statUsers').textContent=users.length;
+
+  const tbody=document.getElementById('ordersBody');
+  if(orders.length===0){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:2rem">Henüz sipariş yok.</td></tr>';return;}
+  tbody.innerHTML=orders.map((o,i)=>`
+    <tr>
+      <td style="font-size:0.7rem;color:var(--muted)">${o.id}</td>
+      <td style="font-weight:700">${o.username}</td>
+      <td><span class="status-pill sp-pending">${o.package}</span></td>
+      <td style="color:var(--gold);font-weight:700">${o.price}₺</td>
+      <td style="font-size:0.75rem;color:var(--muted)">${o.method||'—'}</td>
+      <td><span class="status-pill ${statusClass(o.status)}">${o.status}</span></td>
+      <td style="font-size:0.72rem;color:var(--muted)">${o.date}</td>
+      <td>
+        <div class="action-btns">
+          <button class="ab ab-approve" onclick="updateOrder(${i},'Onaylandı')">✓ Onayla</button>
+          <button class="ab ab-reject" onclick="updateOrder(${i},'Reddedildi')">✕ Reddet</button>
+          <button class="ab ab-pay" onclick="updateOrder(${i},'Ödeme Başarılı')">💳 Ödendi</button>
+          <select class="rank-sel" id="rsel_${i}">
+            <option value="">Rank seç</option>
+            <option value="VIP">VIP</option><option value="VIP+">VIP+</option>
+            <option value="KVIP">KVIP</option><option value="KVIP+">KVIP+</option>
+            <option value="GoldenVIP">GoldenVIP</option><option value="GoldenVIP+">GoldenVIP+</option>
+          </select>
+          <button class="ab ab-rank" onclick="assignRankFromOrder(${i})">Rank Ver</button>
+        </div>
+      </td>
+    </tr>`).join('');
+
+  const ul=document.getElementById('usersList');
+  ul.innerHTML=users.map((u,i)=>`
+    <div class="user-row">
+      <div class="user-av-sm">${u.username[0].toUpperCase()}</div>
+      <div class="user-info">
+        <div class="user-name">${u.username} ${u.role==='admin'?'<span class="badge-admin">ADMİN</span>':u.role==='mod'?'<span class="badge-mod">MOD</span>':''}</div>
+        <div class="user-meta">${u.email||''} · Kayıt: ${u.date||'—'}</div>
+      </div>
+      <span class="rank-badge ${rankBadgeClass(u.rank)}" style="margin-right:0.5rem">${u.rank||'Üye'}</span>
+      <select class="inline-rank" id="urank_${i}" onchange="assignRankToUser(${i},this.value)">
+        <option value="">Rank ata</option>
+        <option value="Üye">Üye</option>
+        <option value="VIP">VIP</option><option value="VIP+">VIP+</option>
+        <option value="KVIP">KVIP</option><option value="KVIP+">KVIP+</option>
+        <option value="GoldenVIP">GoldenVIP</option><option value="GoldenVIP+">GoldenVIP+</option>
+      </select>
+    </div>`).join('');
+}
+
+function renderModPanel(){
+  const orders=getOrders();
+  document.getElementById('modStatTotal').textContent=orders.length;
+  document.getElementById('modStatPending').textContent=orders.filter(o=>o.status==='Bekliyor').length;
+  document.getElementById('modStatApproved').textContent=orders.filter(o=>o.status==='Onaylandı').length;
+  const tbody=document.getElementById('modOrdersBody');
+  if(orders.length===0){tbody.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:2rem">Henüz sipariş yok.</td></tr>';return;}
+  tbody.innerHTML=orders.map((o,i)=>`
+    <tr>
+      <td style="font-size:0.7rem;color:var(--muted)">${o.id}</td>
+      <td style="font-weight:700">${o.username}</td>
+      <td><span class="status-pill sp-pending">${o.package}</span></td>
+      <td style="color:var(--gold);font-weight:700">${o.price}₺</td>
+      <td style="font-size:0.75rem;color:var(--muted)">${o.method||'—'}</td>
+      <td><span class="status-pill ${statusClass(o.status)}">${o.status}</span></td>
+      <td style="font-size:0.72rem;color:var(--muted)">${o.date}</td>
+      <td>
+        <div class="action-btns">
+          <button class="ab ab-approve" onclick="updateOrder(${i},'Onaylandı',true)">✓ Onayla</button>
+          <button class="ab ab-reject" onclick="updateOrder(${i},'Reddedildi',true)">✕ Reddet</button>
+          <button class="ab ab-pay" onclick="updateOrder(${i},'Ödeme Başarılı',true)">💳 Ödendi</button>
+        </div>
+      </td>
+    </tr>`).join('');
+}
+
+function statusClass(s){
+  if(s==='Onaylandı')return 'sp-approved';
+  if(s==='Reddedildi')return 'sp-rejected';
+  if(s==='Ödeme Başarılı')return 'sp-paid';
+  return 'sp-pending';
+}
+function rankBadgeClass(r){
+  if(!r||r==='Üye')return 'rb-uye';
+  if(r.includes('Golden'))return 'rb-gvip';
+  if(r.includes('KVIP'))return 'rb-kvip';
+  return 'rb-vip';
+}
+
+function updateOrder(idx,status,isMod){
+  const orders=getOrders();
+  orders[idx].status=status;
+  saveOrders(orders);
+  showToast('Sipariş güncellendi: '+status,'success');
+  if(isMod)renderModPanel();else renderAdmin();
+}
+
+function assignRankFromOrder(idx){
+  const sel=document.getElementById('rsel_'+idx);
+  const rank=sel.value;
+  if(!rank){showToast('Rank seç.','error');return;}
+  const orders=getOrders();
+  const order=orders[idx];
+  const users=getUsers();
+  const ui=users.findIndex(u=>u.username===order.username);
+  if(ui===-1){showToast('Kullanıcı bulunamadı.','error');return;}
+  users[ui].rank=rank;saveUsers(users);
+  if(currentUser&&currentUser.username===order.username){currentUser.rank=rank;setSession(currentUser);}
+  showToast(order.username+' → '+rank+' rankı verildi!','success');
+  renderAdmin();
+}
+
+function assignRankToUser(idx,rank){
+  if(!rank)return;
+  const users=getUsers();
+  users[idx].rank=rank;saveUsers(users);
+  if(currentUser&&currentUser.username===users[idx].username){currentUser.rank=rank;setSession(currentUser);}
+  showToast(users[idx].username+' → '+rank+' rankı verildi!','success');
+  setTimeout(renderAdmin,300);
+}
+
+function copyIP(){
+  navigator.clipboard.writeText('goldenmcee.falixsvr.me').then(()=>showToast('IP kopyalandı!','success')).catch(()=>showToast('goldenmcee.falixsvr.me','info'));
+}
+
+function showToast(msg,type){
+  const n=document.getElementById('notif');
+  n.textContent=msg;n.className='notif show '+(type||'');
+  setTimeout(()=>n.classList.remove('show'),3000);
+}
+
+updateNav();
+if(currentUser){
+  if(currentUser.role==='admin'){showPage('admin');renderAdmin();}
+  else if(currentUser.role==='mod'){showPage('modpanel');renderModPanel();}
+}
+
+document.getElementById('onlinePlayers').textContent='—';
 </script>
-
-</body>
-</html>
