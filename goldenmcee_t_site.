@@ -1,1 +1,786 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GoldenMC - Minecraft Sunucusu</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --gold:#FFD700;--gold2:#FFA500;--gold3:#B8860B;
+    --dark:#0a0806;--dark2:#12100e;--dark3:#1a1710;
+    --text:#e8d9a0;--muted:#8a7a50;
+    --glow:0 0 20px rgba(255,215,0,0.3);
+  }
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--dark);
+    color:var(--text);
+    font-family:'Rajdhani',sans-serif;
+    font-size:16px;
+    min-height:100vh;
+    overflow-x:hidden;
+  }
 
+  /* BACKGROUND */
+  body::before{
+    content:'';position:fixed;inset:0;z-index:0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%,rgba(255,160,0,0.08) 0%,transparent 70%),
+      repeating-linear-gradient(0deg,transparent,transparent 31px,rgba(255,215,0,0.02) 32px),
+      repeating-linear-gradient(90deg,transparent,transparent 31px,rgba(255,215,0,0.02) 32px);
+    pointer-events:none;
+  }
+
+  .wrapper{position:relative;z-index:1}
+
+  /* NAV */
+  nav{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:1rem 2rem;
+    border-bottom:1px solid rgba(255,215,0,0.15);
+    background:rgba(10,8,6,0.9);
+    backdrop-filter:blur(10px);
+    position:sticky;top:0;z-index:100;
+  }
+  .nav-logo{
+    font-family:'Cinzel',serif;font-weight:900;font-size:1.4rem;
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    letter-spacing:2px;
+  }
+  .nav-links{display:flex;gap:2rem}
+  .nav-links a{
+    color:var(--muted);text-decoration:none;font-weight:600;
+    font-size:0.85rem;letter-spacing:1px;text-transform:uppercase;
+    transition:color 0.2s;
+  }
+  .nav-links a:hover{color:var(--gold)}
+  .nav-ip{
+    background:rgba(255,215,0,0.1);
+    border:1px solid rgba(255,215,0,0.3);
+    padding:0.4rem 1rem;border-radius:4px;
+    font-size:0.8rem;letter-spacing:1px;
+    color:var(--gold);cursor:pointer;
+    transition:all 0.2s;font-family:'Rajdhani',sans-serif;font-weight:600;
+  }
+  .nav-ip:hover{background:rgba(255,215,0,0.2)}
+
+  /* HERO */
+  .hero{
+    text-align:center;padding:5rem 2rem 4rem;
+    position:relative;
+  }
+  .hero-badge{
+    display:inline-block;
+    background:rgba(255,160,0,0.1);
+    border:1px solid rgba(255,160,0,0.3);
+    color:#FFA500;font-size:0.75rem;letter-spacing:3px;
+    padding:0.3rem 1rem;border-radius:2px;
+    text-transform:uppercase;margin-bottom:1.5rem;
+  }
+  .hero h1{
+    font-family:'Cinzel',serif;font-weight:900;
+    font-size:clamp(2.5rem,8vw,5.5rem);
+    line-height:1;letter-spacing:4px;
+    background:linear-gradient(135deg,#FFD700 0%,#FFA500 50%,#FFD700 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:0.5rem;
+  }
+  .hero-sub{
+    font-family:'Cinzel',serif;
+    font-size:clamp(0.8rem,2vw,1.1rem);
+    letter-spacing:6px;color:var(--muted);
+    margin-bottom:2rem;
+  }
+  .hero-desc{
+    max-width:500px;margin:0 auto 2.5rem;
+    color:#9a8a60;font-size:1rem;line-height:1.6;
+  }
+  .hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+  .btn-primary{
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    color:#0a0806;font-weight:700;font-size:0.9rem;
+    padding:0.75rem 2rem;border:none;border-radius:4px;
+    cursor:pointer;letter-spacing:2px;text-transform:uppercase;
+    font-family:'Rajdhani',sans-serif;
+    transition:all 0.2s;text-decoration:none;display:inline-block;
+  }
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(255,165,0,0.4)}
+  .btn-outline{
+    background:transparent;
+    color:var(--gold);font-weight:700;font-size:0.9rem;
+    padding:0.75rem 2rem;
+    border:1px solid rgba(255,215,0,0.4);border-radius:4px;
+    cursor:pointer;letter-spacing:2px;text-transform:uppercase;
+    font-family:'Rajdhani',sans-serif;
+    transition:all 0.2s;text-decoration:none;display:inline-block;
+  }
+  .btn-outline:hover{background:rgba(255,215,0,0.1);border-color:var(--gold)}
+
+  /* STATUS BAR */
+  .status-bar{
+    display:flex;justify-content:center;gap:3rem;
+    padding:1.5rem;margin:0 2rem 4rem;
+    border:1px solid rgba(255,215,0,0.15);
+    border-radius:8px;background:rgba(255,215,0,0.03);
+    flex-wrap:wrap;
+  }
+  .stat-item{text-align:center}
+  .stat-val{
+    font-family:'Cinzel',serif;font-size:1.8rem;font-weight:700;
+    color:var(--gold);display:block;
+  }
+  .stat-label{font-size:0.7rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+  .status-dot{
+    display:inline-block;width:8px;height:8px;
+    border-radius:50%;background:#4ade80;
+    margin-right:6px;animation:pulse 2s infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+
+  /* IP COPY */
+  .ip-box{
+    display:inline-flex;align-items:center;gap:1rem;
+    background:rgba(255,215,0,0.06);
+    border:1px solid rgba(255,215,0,0.2);
+    padding:0.8rem 1.5rem;border-radius:6px;
+    margin-bottom:4rem;cursor:pointer;transition:all 0.2s;
+  }
+  .ip-box:hover{background:rgba(255,215,0,0.12);border-color:rgba(255,215,0,0.4)}
+  .ip-text{font-family:'Cinzel',serif;font-size:1.1rem;color:var(--gold);letter-spacing:2px}
+  .ip-icon{font-size:0.7rem;color:var(--muted);letter-spacing:1px}
+
+  /* SECTION */
+  section{padding:4rem 2rem;max-width:1200px;margin:0 auto}
+  .section-title{
+    font-family:'Cinzel',serif;font-weight:700;
+    font-size:clamp(1.4rem,4vw,2rem);
+    text-align:center;margin-bottom:0.5rem;
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  }
+  .section-sub{
+    text-align:center;color:var(--muted);
+    font-size:0.85rem;letter-spacing:2px;
+    margin-bottom:3rem;text-transform:uppercase;
+  }
+  .divider{
+    width:60px;height:1px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    margin:1rem auto 3rem;
+  }
+
+  /* VIP CARDS */
+  .vip-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+    gap:1rem;
+  }
+  .vip-card{
+    background:rgba(255,215,0,0.04);
+    border:1px solid rgba(255,215,0,0.15);
+    border-radius:8px;padding:1.5rem 1rem;
+    text-align:center;transition:all 0.3s;
+    position:relative;overflow:hidden;cursor:pointer;
+  }
+  .vip-card::before{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    opacity:0;transition:opacity 0.3s;
+  }
+  .vip-card:hover{
+    background:rgba(255,215,0,0.08);
+    border-color:rgba(255,215,0,0.4);
+    transform:translateY(-4px);
+    box-shadow:0 12px 30px rgba(255,165,0,0.15);
+  }
+  .vip-card:hover::before{opacity:1}
+  .vip-card.featured{
+    border-color:rgba(255,215,0,0.5);
+    background:rgba(255,215,0,0.08);
+  }
+  .vip-badge{
+    font-size:0.6rem;letter-spacing:2px;
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    color:#0a0806;padding:0.2rem 0.6rem;border-radius:2px;
+    display:inline-block;margin-bottom:0.75rem;font-weight:700;
+    text-transform:uppercase;
+  }
+  .vip-name{
+    font-family:'Cinzel',serif;font-size:1rem;
+    color:var(--gold);margin-bottom:0.5rem;font-weight:700;
+  }
+  .vip-price{
+    font-family:'Cinzel',serif;font-size:2rem;font-weight:900;
+    color:#fff;line-height:1;
+  }
+  .vip-price span{font-size:0.9rem;color:var(--muted)}
+  .vip-perks{
+    list-style:none;margin:1rem 0;text-align:left;
+  }
+  .vip-perks li{
+    font-size:0.8rem;color:#9a8a60;padding:0.25rem 0;
+    padding-left:1rem;position:relative;
+  }
+  .vip-perks li::before{content:'◆';position:absolute;left:0;font-size:0.5rem;color:var(--gold3);top:0.35rem}
+  .vip-buy{
+    width:100%;background:linear-gradient(135deg,rgba(255,215,0,0.15),rgba(255,165,0,0.15));
+    border:1px solid rgba(255,215,0,0.3);color:var(--gold);
+    padding:0.6rem;border-radius:4px;font-weight:700;font-size:0.8rem;
+    letter-spacing:1px;text-transform:uppercase;
+    cursor:pointer;font-family:'Rajdhani',sans-serif;
+    transition:all 0.2s;margin-top:0.5rem;
+  }
+  .vip-buy:hover{background:linear-gradient(135deg,rgba(255,215,0,0.3),rgba(255,165,0,0.3))}
+
+  /* FEATURES */
+  .features-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:1.5rem;
+  }
+  .feature-card{
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,215,0,0.1);
+    border-radius:8px;padding:1.5rem;
+    transition:border-color 0.3s;
+  }
+  .feature-card:hover{border-color:rgba(255,215,0,0.3)}
+  .feat-icon{font-size:1.8rem;margin-bottom:0.75rem}
+  .feat-title{font-family:'Cinzel',serif;font-size:0.95rem;color:var(--gold);margin-bottom:0.5rem}
+  .feat-desc{font-size:0.85rem;color:var(--muted);line-height:1.5}
+
+  /* RANK CHECK */
+  .rank-check{
+    max-width:500px;margin:0 auto;
+    background:rgba(255,215,0,0.04);
+    border:1px solid rgba(255,215,0,0.2);
+    border-radius:8px;padding:2rem;
+    text-align:center;
+  }
+  .rank-input{
+    width:100%;background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,215,0,0.2);
+    color:var(--text);padding:0.75rem 1rem;border-radius:4px;
+    font-family:'Rajdhani',sans-serif;font-size:1rem;
+    margin-bottom:1rem;outline:none;transition:border-color 0.2s;
+  }
+  .rank-input:focus{border-color:var(--gold)}
+  .rank-result{
+    margin-top:1rem;padding:1rem;
+    background:rgba(0,0,0,0.3);border-radius:4px;
+    font-family:'Cinzel',serif;color:var(--gold);
+    display:none;
+  }
+
+  /* RULES */
+  .rules-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:1rem;
+  }
+  .rule-item{
+    display:flex;gap:1rem;align-items:flex-start;
+    background:rgba(255,255,255,0.02);
+    border:1px solid rgba(255,215,0,0.08);
+    border-radius:6px;padding:1rem;
+  }
+  .rule-num{
+    font-family:'Cinzel',serif;font-size:1.5rem;font-weight:900;
+    color:rgba(255,215,0,0.2);line-height:1;min-width:2rem;
+  }
+  .rule-text{font-size:0.9rem;color:#9a8a60;line-height:1.4}
+  .rule-title{color:var(--text);font-weight:600;margin-bottom:0.25rem}
+
+  /* JOIN STEPS */
+  .steps{display:flex;gap:0;flex-wrap:wrap;justify-content:center}
+  .step{
+    flex:1;min-width:180px;max-width:220px;
+    text-align:center;padding:1.5rem 1rem;
+    position:relative;
+  }
+  .step:not(:last-child)::after{
+    content:'→';position:absolute;right:-10px;top:50%;
+    transform:translateY(-50%);color:var(--muted);font-size:1.2rem;
+  }
+  .step-num{
+    width:48px;height:48px;border-radius:50%;
+    border:2px solid rgba(255,215,0,0.3);
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 1rem;
+    font-family:'Cinzel',serif;font-weight:700;color:var(--gold);
+    font-size:1.1rem;
+  }
+  .step-title{font-family:'Cinzel',serif;font-size:0.9rem;color:var(--gold);margin-bottom:0.4rem}
+  .step-desc{font-size:0.8rem;color:var(--muted);line-height:1.4}
+
+  /* PAYMENT MODAL */
+  .modal-overlay{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,0.85);z-index:1000;
+    align-items:center;justify-content:center;
+    backdrop-filter:blur(4px);
+  }
+  .modal-overlay.open{display:flex}
+  .modal{
+    background:var(--dark2);
+    border:1px solid rgba(255,215,0,0.3);
+    border-radius:12px;padding:2rem;
+    max-width:420px;width:90%;
+    position:relative;
+  }
+  .modal-close{
+    position:absolute;top:1rem;right:1rem;
+    background:none;border:none;color:var(--muted);
+    font-size:1.2rem;cursor:pointer;
+  }
+  .modal h3{font-family:'Cinzel',serif;color:var(--gold);margin-bottom:1.5rem;font-size:1.2rem}
+  .form-group{margin-bottom:1rem}
+  .form-label{font-size:0.8rem;letter-spacing:1px;color:var(--muted);display:block;margin-bottom:0.4rem;text-transform:uppercase}
+  .form-input{
+    width:100%;background:rgba(0,0,0,0.4);
+    border:1px solid rgba(255,215,0,0.2);
+    color:var(--text);padding:0.65rem 1rem;border-radius:4px;
+    font-family:'Rajdhani',sans-serif;font-size:0.95rem;
+    outline:none;transition:border-color 0.2s;
+  }
+  .form-input:focus{border-color:var(--gold)}
+  .modal-total{
+    background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.2);
+    border-radius:4px;padding:0.75rem 1rem;margin:1rem 0;
+    display:flex;justify-content:space-between;align-items:center;
+  }
+  .modal-total-label{font-size:0.85rem;color:var(--muted)}
+  .modal-total-val{font-family:'Cinzel',serif;color:var(--gold);font-size:1.1rem;font-weight:700}
+
+  /* FOOTER */
+  footer{
+    border-top:1px solid rgba(255,215,0,0.1);
+    padding:2rem;text-align:center;
+    color:var(--muted);font-size:0.85rem;
+  }
+  .footer-logo{
+    font-family:'Cinzel',serif;font-weight:900;font-size:1.2rem;
+    background:linear-gradient(135deg,#FFD700,#FFA500);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    margin-bottom:0.5rem;
+  }
+
+  /* TOAST */
+  .toast{
+    position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--dark3);border:1px solid rgba(255,215,0,0.4);
+    color:var(--gold);padding:0.75rem 1.5rem;border-radius:6px;
+    font-weight:600;font-size:0.9rem;letter-spacing:1px;
+    z-index:9999;transition:transform 0.3s;pointer-events:none;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0)}
+
+  @media(max-width:600px){
+    nav{padding:0.75rem 1rem}
+    .nav-links{display:none}
+    .hero{padding:3rem 1rem 2rem}
+    .status-bar{gap:1.5rem}
+    .step:not(:last-child)::after{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrapper">
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">⚔ GoldenMC</div>
+  <div class="nav-links">
+    <a href="#market">Market</a>
+    <a href="#features">Özellikler</a>
+    <a href="#rules">Kurallar</a>
+    <a href="#join">Katıl</a>
+  </div>
+  <button class="nav-ip" onclick="copyIP()">goldenmcee.falixsvr.me</button>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-badge">⚡ Survival · Economy · PvP · Minigames</div>
+  <h1>GOLDENMCEE</h1>
+  <p class="hero-sub">TÜRK MİNECRAFT SUNUCUSU</p>
+  <p class="hero-desc">Eşsiz bir Minecraft deneyimi seni bekliyor. VIP rütbeleriyle özel avantajlar kazan, topluluğa katıl.</p>
+  <div class="hero-btns">
+    <a href="#market" class="btn-primary">🏆 VIP Satın Al</a>
+    <a href="#join" class="btn-outline">Nasıl Katılırım?</a>
+  </div>
+</header>
+
+<!-- STATUS -->
+<div style="max-width:1200px;margin:0 auto;padding:0 2rem">
+  <div class="ip-box" onclick="copyIP()">
+    <span class="ip-text">goldenmcee.falixsvr.me</span>
+    <span class="ip-icon">▤ KOPYALA</span>
+  </div>
+
+  <div class="status-bar">
+    <div class="stat-item">
+      <span class="stat-val" id="player-count"><span class="status-dot"></span>—</span>
+      <span class="stat-label">Aktif Oyuncu</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-val" style="color:#4ade80">✓</span>
+      <span class="stat-label">Sunucu Durumu</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-val">Java</span>
+      <span class="stat-label">Sunucu Türü</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-val">1.8 - 1.21</span>
+      <span class="stat-label">Desteklenen Sürüm</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-val">7/24</span>
+      <span class="stat-label">Uptime</span>
+    </div>
+  </div>
+</div>
+
+<!-- VIP MARKET -->
+<section id="market">
+  <h2 class="section-title">VIP Market</h2>
+  <p class="section-sub">Rütbeni seç, avantajlarını kazan</p>
+  <div class="divider"></div>
+  <div class="vip-grid">
+
+    <div class="vip-card" onclick="openModal('VIP',60)">
+      <span class="vip-badge">Başlangıç</span>
+      <div class="vip-name">VIP</div>
+      <div class="vip-price">60<span> ₺</span></div>
+      <ul class="vip-perks">
+        <li>Özel VIP öneki</li>
+        <li>Renk kodları sohbet</li>
+        <li>2x XP kasası</li>
+        <li>/fly komutu</li>
+        <li>3 ev seti</li>
+      </ul>
+      <button class="vip-buy">Satın Al</button>
+    </div>
+
+    <div class="vip-card" onclick="openModal('VIP+',80)">
+      <span class="vip-badge">Popüler</span>
+      <div class="vip-name">VIP+</div>
+      <div class="vip-price">80<span> ₺</span></div>
+      <ul class="vip-perks">
+        <li>VIP+ özel öneki</li>
+        <li>Formatlanmış sohbet</li>
+        <li>3x XP kasası</li>
+        <li>/fly + /speed</li>
+        <li>5 ev seti</li>
+      </ul>
+      <button class="vip-buy">Satın Al</button>
+    </div>
+
+    <div class="vip-card featured" onclick="openModal('KVIP',100)">
+      <span class="vip-badge" style="background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff">Önerilen</span>
+      <div class="vip-name" style="color:#7dd3fc">KVIP</div>
+      <div class="vip-price">100<span> ₺</span></div>
+      <ul class="vip-perks">
+        <li>Kral VIP öneki</li>
+        <li>Özel particle efekti</li>
+        <li>5x XP kasası</li>
+        <li>/god modu</li>
+        <li>8 ev seti</li>
+      </ul>
+      <button class="vip-buy" style="border-color:rgba(125,211,252,0.4);color:#7dd3fc">Satın Al</button>
+    </div>
+
+    <div class="vip-card" onclick="openModal('KVIP+',120)">
+      <span class="vip-badge" style="background:linear-gradient(135deg,#00c6ff,#0072ff);color:#fff">Premium</span>
+      <div class="vip-name" style="color:#7dd3fc">KVIP+</div>
+      <div class="vip-price">120<span> ₺</span></div>
+      <ul class="vip-perks">
+        <li>Kral VIP+ öneki</li>
+        <li>Özel join mesajı</li>
+        <li>7x XP kasası</li>
+        <li>/invsee komutu</li>
+        <li>10 ev seti</li>
+      </ul>
+      <button class="vip-buy" style="border-color:rgba(125,211,252,0.4);color:#7dd3fc">Satın Al</button>
+    </div>
+
+    <div class="vip-card" onclick="openModal('GoldenVIP',160)">
+      <span class="vip-badge" style="background:linear-gradient(135deg,#FFD700,#FF8C00)">Elite</span>
+      <div class="vip-name">GoldenVIP</div>
+      <div class="vip-price">160<span> ₺</span></div>
+      <ul class="vip-perks">
+        <li>Altın parlayan önek</li>
+        <li>Özel ölüm efekti</li>
+        <li>10x XP kasası</li>
+        <li>Tüm komutlar</li>
+        <li>15 ev seti</li>
+      </ul>
+      <button class="vip-buy">Satın Al</button>
+    </div>
+
+    <div class="vip-card" onclick="openModal('GoldenVIP+',200)" style="border-color:rgba(255,215,0,0.4)">
+      <span class="vip-badge" style="background:linear-gradient(135deg,#FFD700,#FF4500)">⭐ En İyi</span>
+      <div class="vip-name">GoldenVIP+</div>
+      <div class="vip-price">200<span> ₺</span></div>
+      <ul class="vip-perks">
+        <li>Efsane altın önek</li>
+        <li>Özel giriş animasyon</li>
+        <li>Sınırsız XP kasası</li>
+        <li>Admin koridoru erişim</li>
+        <li>Sınırsız ev seti</li>
+      </ul>
+      <button class="vip-buy" style="background:linear-gradient(135deg,rgba(255,215,0,0.25),rgba(255,69,0,0.2));border-color:rgba(255,215,0,0.5)">Satın Al</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- RANK CHECK -->
+<section>
+  <h2 class="section-title">Rütbe Sorgula</h2>
+  <p class="section-sub">Kullanıcı adını gir, rütbeni öğren</p>
+  <div class="divider"></div>
+  <div class="rank-check">
+    <input type="text" class="rank-input" id="rankUsername" placeholder="Minecraft kullanıcı adı...">
+    <button class="btn-primary" style="width:100%" onclick="checkRank()">🔍 Sorgula</button>
+    <div class="rank-result" id="rankResult"></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <h2 class="section-title">Sunucu Özellikleri</h2>
+  <p class="section-sub">GoldenMC'yi özel kılan nedir?</p>
+  <div class="divider"></div>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feat-icon">⚔️</div>
+      <div class="feat-title">PvP Arenaları</div>
+      <div class="feat-desc">Farklı temalı PvP alanlarında rakiplerinle kozunu paylaş.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon">🏰</div>
+      <div class="feat-title">Survival Modu</div>
+      <div class="feat-desc">Özenle dengeli survival deneyimi, griefing koruması ile.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon">💰</div>
+      <div class="feat-title">Ekonomi Sistemi</div>
+      <div class="feat-desc">Kendi işini kur, ticaret yap, zengin ol. Güçlü ekonomi sistemi.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon">🎮</div>
+      <div class="feat-title">Minigames</div>
+      <div class="feat-desc">BedWars, SkyWars ve daha fazla mini oyun her gün aktif.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon">🌍</div>
+      <div class="feat-title">Özel Haritalar</div>
+      <div class="feat-desc">El yapımı, özel tasarım haritalar ve benzersiz dünyalar.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feat-icon">👥</div>
+      <div class="feat-title">Aktif Topluluk</div>
+      <div class="feat-desc">Discord sunucumuzda her zaman aktif yöneticiler ve oyuncular.</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW TO JOIN -->
+<section id="join">
+  <h2 class="section-title">Nasıl Katılırsın?</h2>
+  <p class="section-sub">3 adımda GoldenMC'de oyna</p>
+  <div class="divider"></div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-title">Minecraft Aç</div>
+      <div class="step-desc">Java Edition 1.8 veya üzeri bir sürüm yeterli.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-title">Sunucu Ekle</div>
+      <div class="step-desc">Multiplayer → Add Server → IP'yi yapıştır.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-title">IP Gir</div>
+      <div class="step-desc" style="color:var(--gold);font-weight:600">goldenmcee.falixsvr.me</div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-title">Oyna!</div>
+      <div class="step-desc">Hoş geldin mesajını al ve macerana başla!</div>
+    </div>
+  </div>
+</section>
+
+<!-- RULES -->
+<section id="rules">
+  <h2 class="section-title">Sunucu Kuralları</h2>
+  <p class="section-sub">Adil oyun için herkesin uyması gereken kurallar</p>
+  <div class="divider"></div>
+  <div class="rules-grid">
+    <div class="rule-item">
+      <div class="rule-num">01</div>
+      <div>
+        <div class="rule-title">Hile Yasaktır</div>
+        <div class="rule-text">Her türlü hile yazılımı, mod veya exploit kullanımı yasaktır ve kalıcı ban ile sonuçlanır.</div>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">02</div>
+      <div>
+        <div class="rule-title">Saygılı Ol</div>
+        <div class="rule-text">Hakaret, küfür ve ırkçılık tolere edilmez. Herkese saygılı davran.</div>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">03</div>
+      <div>
+        <div class="rule-title">Reklam Yasak</div>
+        <div class="rule-text">Başka sunucu reklamı yapmak yasaktır. İhlal: kalıcı ban.</div>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">04</div>
+      <div>
+        <div class="rule-title">Spam Yapma</div>
+        <div class="rule-text">Sohbette spam, caps lock kötüye kullanımı ve flood yapmak yasaktır.</div>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">05</div>
+      <div>
+        <div class="rule-title">Griefing Yasak</div>
+        <div class="rule-text">Başkasının inşaatını tahrip etmek yasak. Korumalı bölgelere saygı göster.</div>
+      </div>
+    </div>
+    <div class="rule-item">
+      <div class="rule-num">06</div>
+      <div>
+        <div class="rule-title">Yetkililere Uy</div>
+        <div class="rule-text">Moderatör ve admin kararlarına saygı göster. İtiraz için Discord'u kullan.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">⚔ GoldenMC</div>
+  <p style="margin-bottom:0.5rem">goldenmcee.falixsvr.me</p>
+  <p style="font-size:0.75rem;color:#4a4030">© 2025 GoldenMC · Tüm hakları saklıdır · Minecraft, Mojang Studios'un ticari markasıdır</p>
+</footer>
+
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">✕</button>
+    <h3 id="modalTitle">VIP Satın Al</h3>
+    <div class="form-group">
+      <label class="form-label">Minecraft Kullanıcı Adı</label>
+      <input type="text" class="form-input" id="payUsername" placeholder="OyuncuAdın">
+    </div>
+    <div class="form-group">
+      <label class="form-label">E-posta</label>
+      <input type="email" class="form-input" id="payEmail" placeholder="ornek@email.com">
+    </div>
+    <div class="modal-total">
+      <span class="modal-total-label">Toplam Tutar</span>
+      <span class="modal-total-val" id="modalPrice">60 ₺</span>
+    </div>
+    <button class="btn-primary" style="width:100%;margin-top:0.5rem" onclick="startPayment()">💳 Ödemeye Geç</button>
+    <p style="font-size:0.75rem;color:var(--muted);margin-top:0.75rem;text-align:center">Ödeme PayTR ile güvenli şekilde işlenir. Satın alma sonrası rank otomatik verilir.</p>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://goldenmcee.falixsvr.me';
+let currentRank = '';
+let currentPrice = 0;
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+function copyIP(){
+  navigator.clipboard.writeText('goldenmcee.falixsvr.me').then(()=>showToast('✓ IP kopyalandı!')).catch(()=>showToast('IP: goldenmcee.falixsvr.me'));
+}
+
+function openModal(rank,price){
+  currentRank=rank;currentPrice=price;
+  document.getElementById('modalTitle').textContent=rank+' Satın Al';
+  document.getElementById('modalPrice').textContent=price+' ₺';
+  document.getElementById('modalOverlay').classList.add('open');
+}
+
+function closeModal(e){
+  if(e.target.id==='modalOverlay') document.getElementById('modalOverlay').classList.remove('open');
+}
+
+async function startPayment(){
+  const username=document.getElementById('payUsername').value.trim();
+  const email=document.getElementById('payEmail').value.trim();
+  if(!username){showToast('⚠ Kullanıcı adı gir');return;}
+  if(!email||!email.includes('@')){showToast('⚠ Geçerli e-posta gir');return;}
+  showToast('⏳ Ödeme başlatılıyor...');
+  try{
+    const r=await fetch('/api/payment/start',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username,email,packageName:currentRank,userIp:'127.0.0.1'})
+    });
+    const d=await r.json();
+    if(d.ok&&d.token){
+      document.getElementById('modalOverlay').classList.remove('open');
+      window.open('https://www.paytr.com/odeme?token='+d.token,'_blank');
+    }else{
+      showToast('⚠ '+(d.error||'Hata oluştu'));
+    }
+  }catch{
+    showToast('⚠ Bağlantı hatası');
+  }
+}
+
+async function checkRank(){
+  const username=document.getElementById('rankUsername').value.trim();
+  if(!username){showToast('⚠ Kullanıcı adı gir');return;}
+  const el=document.getElementById('rankResult');
+  el.style.display='block';el.textContent='Sorgulanıyor...';
+  try{
+    const r=await fetch('/api/user/'+encodeURIComponent(username));
+    const d=await r.json();
+    if(d.ok){
+      el.innerHTML='<span style="color:var(--muted);font-size:0.8rem;display:block;margin-bottom:0.3rem">'+username+'</span><span>'+d.rank+'</span>';
+    }else{
+      el.textContent='Oyuncu bulunamadı';
+    }
+  }catch{
+    el.textContent='Bağlantı hatası — sunucu çevrimdışı olabilir';
+  }
+}
+
+async function loadStatus(){
+  try{
+    const r=await fetch('/api/players');
+    const d=await r.json();
+    if(d.ok){
+      document.getElementById('player-count').innerHTML='<span class="status-dot"></span>'+d.online+'/'+d.max;
+    }
+  }catch{}
+}
+
+loadStatus();
+</script>
+</body>
+</html>
