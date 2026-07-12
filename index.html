@@ -3,881 +3,262 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HovaNetwork — Minecraft Sunucusu</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<title>HovaNetwork — Yönetim Paneli</title>
 <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  :root{
+    --bg:#07070f; --surface:#0f0f1e; --surface2:#161628; --border:rgba(255,255,255,.08);
+    --gold:#ffd700; --vip-plus:#c084fc; --cyan:#22d3ee; --green:#4ade80; --red:#f87171;
+    --text:#e2e8f0; --muted:#94a3b8; --radius:12px;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;}
+  .wrap{max-width:480px;margin:80px auto;padding:0 20px;}
+  .panel-wrap{max-width:900px;margin:40px auto;padding:0 20px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:36px;}
+  .logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:28px;}
+  .logo-hex{width:40px;height:40px;background:linear-gradient(135deg,var(--gold),var(--vip-plus));clip-path:polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);display:flex;align-items:center;justify-content:center;font-family:'Rajdhani',sans-serif;font-weight:700;color:#000;}
+  .logo-text{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:700;background:linear-gradient(90deg,var(--gold),var(--vip-plus));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+  h2{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:20px;text-align:center;}
+  .form-group{margin-bottom:16px;}
+  .form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;}
+  .form-group input,select,textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:9px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;padding:11px 14px;outline:none;}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;width:100%;transition:transform .2s;}
+  .btn-gold{background:linear-gradient(135deg,var(--gold),#ff9d00);color:#000;}
+  .btn-red{background:linear-gradient(135deg,var(--red),#b91c1c);color:#fff;}
+  .btn:hover{transform:translateY(-1px);}
+  .err{color:var(--red);font-size:13px;margin-top:12px;text-align:center;display:none;}
 
-  :root {
-    --bg:        #07070f;
-    --surface:   #0f0f1e;
-    --surface2:  #161628;
-    --border:    rgba(255,255,255,0.08);
-    --gold:      #ffd700;
-    --gold-dim:  #c9a100;
-    --vip-plus:  #c084fc;
-    --vip-plus-dim: #9333ea;
-    --cyan:      #22d3ee;
-    --green:     #4ade80;
-    --red:       #f87171;
-    --text:      #e2e8f0;
-    --muted:     #94a3b8;
-    --radius:    12px;
-  }
+  .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;flex-wrap:wrap;gap:10px;}
+  .role-badge{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:13px;padding:5px 14px;border-radius:999px;text-transform:uppercase;letter-spacing:.5px;}
+  .role-yardimci{background:rgba(34,211,238,.12);color:var(--cyan);border:1px solid rgba(34,211,238,.3);}
+  .role-yonetici{background:rgba(255,215,0,.12);color:var(--gold);border:1px solid rgba(255,215,0,.3);}
+  .role-kurucu{background:rgba(192,132,252,.12);color:var(--vip-plus);border:1px solid rgba(192,132,252,.3);}
 
-  html { scroll-behavior: smooth; }
+  .cmd-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-bottom:28px;}
+  .cmd-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;}
+  .cmd-card h3{font-size:15px;font-weight:600;margin-bottom:14px;}
+  .cmd-card .form-group{margin-bottom:10px;}
+  .locked{opacity:.35;pointer-events:none;position:relative;}
+  .locked::after{content:'🔒 Yetkin yok';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--muted);background:rgba(7,7,15,.4);border-radius:14px;}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
+  .console-box{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:28px;}
+  .console-out{background:#000;border-radius:9px;padding:14px;font-family:monospace;font-size:12px;color:var(--green);min-height:80px;max-height:220px;overflow-y:auto;white-space:pre-wrap;margin-top:12px;}
 
-  /* ── STARS BG ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      radial-gradient(1px 1px at 20% 30%, rgba(255,255,255,.4) 0%, transparent 0%),
-      radial-gradient(1px 1px at 60% 70%, rgba(255,255,255,.3) 0%, transparent 0%),
-      radial-gradient(1px 1px at 80% 15%, rgba(255,255,255,.5) 0%, transparent 0%),
-      radial-gradient(1px 1px at 40% 85%, rgba(255,255,255,.3) 0%, transparent 0%),
-      radial-gradient(1.5px 1.5px at 10% 55%, rgba(255,215,0,.3) 0%, transparent 0%),
-      radial-gradient(1px 1px at 90% 45%, rgba(192,132,252,.3) 0%, transparent 0%);
-    background-size: 500px 500px;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* ── NAV ── */
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(7,7,15,.85);
-    backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 clamp(1rem, 5vw, 4rem);
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    text-decoration: none;
-  }
-  .logo-hex {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--gold), var(--vip-plus));
-    clip-path: polygon(50% 0%,93% 25%,93% 75%,50% 100%,7% 75%,7% 25%);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Rajdhani', sans-serif;
-    font-weight: 700; font-size: 14px;
-    color: #000;
-    flex-shrink: 0;
-  }
-  .logo-text {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    background: linear-gradient(90deg, var(--gold), var(--vip-plus));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .nav-links { display: flex; gap: 6px; align-items: center; }
-  .nav-links a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    padding: 6px 14px;
-    border-radius: 8px;
-    transition: color .2s, background .2s;
-  }
-  .nav-links a:hover, .nav-links a.active {
-    color: var(--text);
-    background: var(--surface2);
-  }
-
-  /* ── PAGES ── */
-  .page { display: none; position: relative; z-index: 1; }
-  .page.active { display: block; }
-
-  /* ── HERO ── */
-  .hero {
-    text-align: center;
-    padding: clamp(60px, 10vh, 120px) clamp(1rem, 5vw, 4rem) 80px;
-  }
-  .hero-badge {
-    display: inline-block;
-    background: rgba(255,215,0,.1);
-    border: 1px solid rgba(255,215,0,.3);
-    color: var(--gold);
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 5px 14px;
-    border-radius: 999px;
-    margin-bottom: 24px;
-  }
-  .hero h1 {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: clamp(2.8rem, 7vw, 6rem);
-    font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: -1px;
-    margin-bottom: 20px;
-  }
-  .hero h1 span.g {
-    background: linear-gradient(135deg, var(--gold) 0%, #ff9d00 50%, var(--vip-plus) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .hero p {
-    max-width: 560px;
-    margin: 0 auto 40px;
-    color: var(--muted);
-    font-size: 17px;
-    line-height: 1.7;
-  }
-  .hero-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-
-  /* ── BUTTONS ── */
-  .btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 12px 26px;
-    border-radius: 10px;
-    font-size: 15px; font-weight: 600;
-    cursor: pointer;
-    border: none;
-    text-decoration: none;
-    transition: all .25s;
-  }
-  .btn-gold {
-    background: linear-gradient(135deg, var(--gold), #ff9d00);
-    color: #000;
-    box-shadow: 0 0 20px rgba(255,215,0,.25);
-  }
-  .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 0 35px rgba(255,215,0,.45); }
-  .btn-outline {
-    background: transparent;
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-  .btn-outline:hover { border-color: rgba(255,255,255,.2); background: var(--surface2); }
-  .btn-purple {
-    background: linear-gradient(135deg, var(--vip-plus), var(--vip-plus-dim));
-    color: #fff;
-    box-shadow: 0 0 20px rgba(192,132,252,.25);
-  }
-  .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 0 35px rgba(192,132,252,.45); }
-  .btn-cyan {
-    background: linear-gradient(135deg, var(--cyan), #0891b2);
-    color: #000;
-  }
-  .btn-cyan:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(34,211,238,.35); }
-  .btn-green {
-    background: linear-gradient(135deg, var(--green), #16a34a);
-    color: #000;
-  }
-  .btn-green:hover { transform: translateY(-2px); }
-
-  /* ── SERVER INFO STRIP ── */
-  .server-strip {
-    max-width: 800px;
-    margin: 0 auto 80px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 40px;
-    padding: 22px 32px;
-    flex-wrap: wrap;
-  }
-  .strip-item { text-align: center; }
-  .strip-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
-  .strip-val { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; color: var(--text); }
-  .strip-val.online { color: var(--green); }
-  .divider-v { width: 1px; height: 40px; background: var(--border); }
-
-  /* ── SECTION ── */
-  .section { padding: 70px clamp(1rem, 5vw, 4rem); max-width: 1200px; margin: 0 auto; }
-  .section-label {
-    font-size: 11px; letter-spacing: 2.5px; text-transform: uppercase;
-    color: var(--gold); font-weight: 600; margin-bottom: 10px;
-  }
-  .section-title {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: clamp(1.8rem, 4vw, 3rem);
-    font-weight: 700;
-    margin-bottom: 14px;
-  }
-  .section-sub { color: var(--muted); font-size: 15px; line-height: 1.7; max-width: 520px; margin-bottom: 48px; }
-
-  /* ── RANK CARDS ── */
-  .rank-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
-
-  .rank-card {
-    background: var(--surface);
-    border-radius: 16px;
-    padding: 32px 28px;
-    border: 1px solid var(--border);
-    position: relative;
-    overflow: hidden;
-    transition: transform .3s, box-shadow .3s;
-    cursor: default;
-  }
-  .rank-card::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
-  }
-  .rank-card.vip::before { background: linear-gradient(90deg, var(--gold), #ff9d00); }
-  .rank-card.vip-plus::before { background: linear-gradient(90deg, var(--vip-plus), var(--vip-plus-dim)); }
-  .rank-card.golden::before { background: linear-gradient(90deg, #ffd700, #ff6b00); }
-  .rank-card.risk::before { background: linear-gradient(90deg, var(--red), #b91c1c); }
-
-  .rank-card:hover { transform: translateY(-6px); }
-  .rank-card.vip:hover      { box-shadow: 0 16px 50px rgba(255,215,0,.2); }
-  .rank-card.vip-plus:hover { box-shadow: 0 16px 50px rgba(192,132,252,.2); }
-  .rank-card.golden:hover   { box-shadow: 0 16px 50px rgba(255,107,0,.2); }
-  .rank-card.risk:hover     { box-shadow: 0 16px 50px rgba(248,113,113,.2); }
-
-  .rank-badge {
-    display: inline-flex; align-items: center; gap: 8px;
-    padding: 6px 14px; border-radius: 999px;
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 15px; font-weight: 700; letter-spacing: .5px;
-    margin-bottom: 20px;
-  }
-  .badge-vip      { background: rgba(255,215,0,.12); color: var(--gold); border: 1px solid rgba(255,215,0,.25); }
-  .badge-vip-plus { background: rgba(192,132,252,.12); color: var(--vip-plus); border: 1px solid rgba(192,132,252,.25); }
-  .badge-golden   { background: rgba(255,107,0,.12); color: #ff9d00; border: 1px solid rgba(255,107,0,.25); }
-  .badge-risk     { background: rgba(248,113,113,.12); color: var(--red); border: 1px solid rgba(248,113,113,.25); }
-
-  .rank-icon { font-size: 18px; }
-  .rank-price {
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 3rem; font-weight: 700;
-    line-height: 1;
-    margin-bottom: 6px;
-  }
-  .rank-price span { font-size: 1.2rem; font-weight: 500; color: var(--muted); }
-  .rank-type { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
-  .rank-features { list-style: none; margin-bottom: 28px; display: flex; flex-direction: column; gap: 10px; }
-  .rank-features li {
-    display: flex; align-items: center; gap: 10px;
-    font-size: 14px; color: var(--muted);
-  }
-  .rank-features li::before { content: '✦'; font-size: 10px; flex-shrink: 0; }
-  .rank-card.vip .rank-features li::before      { color: var(--gold); }
-  .rank-card.vip-plus .rank-features li::before { color: var(--vip-plus); }
-  .rank-card.golden .rank-features li::before   { color: #ff9d00; }
-  .rank-card.risk .rank-features li::before     { color: var(--red); }
-
-  /* popular tag */
-  .popular-tag {
-    position: absolute; top: 18px; right: 18px;
-    background: var(--vip-plus);
-    color: #fff;
-    font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
-    padding: 3px 10px; border-radius: 999px;
-  }
-
-  /* ── PAYMENT PAGE ── */
-  .payment-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 52px; }
-  .step-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; padding: 28px 24px;
-    transition: border-color .25s;
-  }
-  .step-card:hover { border-color: rgba(255,215,0,.3); }
-  .step-num {
-    font-family: 'Rajdhani', sans-serif; font-size: 13px;
-    font-weight: 700; letter-spacing: 2px;
-    color: var(--gold); margin-bottom: 12px;
-  }
-  .step-card h3 { font-size: 16px; font-weight: 600; margin-bottom: 8px; }
-  .step-card p { color: var(--muted); font-size: 14px; line-height: 1.6; }
-
-  .payment-methods { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 40px; }
-  .pay-method {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 16px 22px;
-    display: flex; align-items: center; gap: 10px;
-    font-size: 15px; font-weight: 500;
-    cursor: pointer; transition: border-color .2s, background .2s;
-  }
-  .pay-method:hover, .pay-method.selected {
-    border-color: rgba(255,215,0,.4);
-    background: rgba(255,215,0,.05);
-    color: var(--gold);
-  }
-  .pay-method span { font-size: 20px; }
-
-  .purchase-form {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 36px;
-    max-width: 520px;
-  }
-  .form-title { font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 24px; }
-  .form-group { margin-bottom: 18px; }
-  .form-group label { display: block; font-size: 13px; font-weight: 500; color: var(--muted); margin-bottom: 7px; }
-  .form-group input, .form-group select {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    padding: 11px 14px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  .form-group input:focus, .form-group select:focus { border-color: rgba(255,215,0,.4); }
-  .form-group select option { background: var(--surface2); }
-
-  /* ── MY PAYMENTS ── */
-  .payments-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-  }
-  .payments-table th {
-    text-align: left;
-    padding: 12px 18px;
-    font-size: 11px; font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-  }
-  .payments-table td { padding: 14px 18px; border-bottom: 1px solid var(--border); color: var(--muted); }
-  .payments-table tr:last-child td { border-bottom: none; }
-  .payments-table tr:hover td { background: var(--surface2); }
-  .status-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
-  }
-  .status-ok     { background: rgba(74,222,128,.1); color: var(--green); }
-  .status-pending{ background: rgba(255,215,0,.1);  color: var(--gold); }
-  .status-fail   { background: rgba(248,113,113,.1); color: var(--red); }
-  .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-
-  .empty-state { text-align: center; padding: 64px 32px; color: var(--muted); }
-  .empty-state .icon { font-size: 48px; margin-bottom: 16px; }
-  .empty-state h3 { font-family: 'Rajdhani', sans-serif; font-size: 20px; color: var(--text); margin-bottom: 8px; }
-
-  /* ── SUPPORT PAGE ── */
-  .ticket-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  @media (max-width: 640px) { .ticket-grid { grid-template-columns: 1fr; } }
-
-  .ticket-form {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 32px;
-  }
-  .ticket-form textarea {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 9px;
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px; line-height: 1.6;
-    padding: 12px 14px;
-    resize: vertical; min-height: 120px;
-    outline: none;
-    transition: border-color .2s;
-  }
-  .ticket-form textarea:focus { border-color: rgba(255,215,0,.4); }
-
-  .faq-list { display: flex; flex-direction: column; gap: 12px; }
-  .faq-item {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden;
-  }
-  .faq-q {
-    padding: 16px 20px;
-    font-weight: 500; font-size: 14px;
-    cursor: pointer;
-    display: flex; justify-content: space-between; align-items: center;
-    transition: background .2s;
-  }
-  .faq-q:hover { background: var(--surface2); }
-  .faq-q::after { content: '+'; color: var(--gold); font-size: 18px; font-weight: 300; }
-  .faq-a {
-    display: none;
-    padding: 0 20px 16px;
-    color: var(--muted); font-size: 14px; line-height: 1.7;
-  }
-  .faq-item.open .faq-q::after { content: '−'; }
-  .faq-item.open .faq-a { display: block; }
-
-  .discord-cta {
-    background: linear-gradient(135deg, #5865F2, #4752c4);
-    border-radius: 16px;
-    padding: 32px;
-    display: flex; align-items: center; justify-content: space-between; gap: 20px;
-    flex-wrap: wrap;
-    margin-top: 28px;
-  }
-  .discord-cta h3 { font-family: 'Rajdhani', sans-serif; font-size: 22px; font-weight: 700; }
-  .discord-cta p { color: rgba(255,255,255,.75); font-size: 14px; margin-top: 4px; }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%) translateY(80px);
-    background: var(--surface2); border: 1px solid var(--border);
-    color: var(--text); padding: 12px 24px;
-    border-radius: 12px; font-size: 14px; font-weight: 500;
-    z-index: 999; opacity: 0;
-    transition: all .35s;
-    white-space: nowrap;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  /* ── FOOTER ── */
-  footer {
-    position: relative; z-index: 1;
-    border-top: 1px solid var(--border);
-    padding: 32px clamp(1rem, 5vw, 4rem);
-    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
-    color: var(--muted); font-size: 13px;
-  }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 600px) {
-    .nav-links a span { display: none; }
-    .server-strip { gap: 20px; }
-    .divider-v { display: none; }
-  }
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:12px 24px;border-radius:12px;font-size:14px;font-weight:500;z-index:999;opacity:0;transition:all .35s;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .logout{color:var(--muted);font-size:13px;cursor:pointer;text-decoration:underline;}
+  #page-panel{display:none;}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-  <a href="#" class="logo" onclick="showPage('market')">
-    <div class="logo-hex">HN</div>
-    <span class="logo-text">HovaNetwork</span>
-  </a>
-  <div class="nav-links">
-    <a href="#" onclick="showPage('market')" id="nav-market" class="active"><span>🏪 </span>Market</a>
-    <a href="#" onclick="showPage('payments')" id="nav-payments"><span>💳 </span>Ödemelerim</a>
-    <a href="#" onclick="showPage('support')" id="nav-support"><span>🎫 </span>Destek</a>
-  </div>
-</nav>
-
-<!-- ════════════════ MARKET PAGE ════════════════ -->
-<div id="page-market" class="page active">
-
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-badge">⚡ En İyi Minecraft Deneyimi</div>
-    <h1>Sunucuya Katıl,<br><span class="g">Efsane Ol.</span></h1>
-    <p>HovaNetwork'te üstün yetenekler, özel ranklar ve kazançlı kasalarla oyun deneyimini zirveye taşı.</p>
-    <div class="hero-btns">
-      <a href="#ranklist" class="btn btn-gold">Rank Satın Al</a>
-      <a href="#kasalar" class="btn btn-outline">Kasaları Keşfet</a>
+<!-- LOGIN -->
+<div id="page-login" class="wrap">
+  <div class="logo"><div class="logo-hex">HN</div><span class="logo-text">HovaNetwork</span></div>
+  <div class="card">
+    <h2>🔐 Yönetim Paneli Girişi</h2>
+    <div class="form-group">
+      <label>Panel Kullanıcı Adı</label>
+      <input type="text" id="login-user" placeholder="kullanici_adin">
     </div>
-  </div>
-
-  <!-- Server strip -->
-  <div class="server-strip">
-    <div class="strip-item">
-      <div class="strip-label">Sunucu IP</div>
-      <div class="strip-val" style="font-size:16px;font-family:'Rajdhani',sans-serif;">play.hovanetwork.net</div>
+    <div class="form-group">
+      <label>Şifre</label>
+      <input type="password" id="login-pass" placeholder="••••••••">
     </div>
-    <div class="divider-v"></div>
-    <div class="strip-item">
-      <div class="strip-label">Durum</div>
-      <div class="strip-val online">● Çevrimiçi</div>
-    </div>
-    <div class="divider-v"></div>
-    <div class="strip-item">
-      <div class="strip-label">Oyuncular</div>
-      <div class="strip-val">247 / 500</div>
-    </div>
-    <div class="divider-v"></div>
-    <div class="strip-item">
-      <div class="strip-label">Versiyon</div>
-      <div class="strip-val">1.8 — 1.21</div>
-    </div>
-  </div>
-
-  <!-- Rank section -->
-  <div class="section" id="ranklist">
-    <div class="section-label">Ranklar</div>
-    <div class="section-title">Gücünü Seç</div>
-    <p class="section-sub">Sunucumuzda iki özel rank ile ayrıcalıklı deneyim yaşa. Tek seferlik ödeme, ömür boyu rank.</p>
-
-    <div class="rank-grid">
-      <!-- VIP -->
-      <div class="rank-card vip">
-        <div class="rank-badge badge-vip"><span class="rank-icon">⭐</span> VIP</div>
-        <div class="rank-price">100 <span>₺</span></div>
-        <div class="rank-type">Kalıcı Rank · Tek Ödeme</div>
-        <ul class="rank-features">
-          <li>Özel [VIP] prefix etiketi</li>
-          <li>Günde 3 kit hakkı</li>
-          <li>Ekstra /home slot (5 adet)</li>
-          <li>Sunucuya öncelikli giriş</li>
-          <li>Özel VIP kanalına erişim</li>
-          <li>Renkli chat mesajları</li>
-        </ul>
-        <button class="btn btn-gold" style="width:100%;justify-content:center;" onclick="startPurchase('VIP Rank', 100)">Satın Al — 100 ₺</button>
-      </div>
-
-      <!-- VIP+ -->
-      <div class="rank-card vip-plus">
-        <div class="popular-tag">Popüler</div>
-        <div class="rank-badge badge-vip-plus"><span class="rank-icon">💎</span> VIP+</div>
-        <div class="rank-price" style="color:var(--vip-plus)">150 <span>₺</span></div>
-        <div class="rank-type">Kalıcı Rank · Tek Ödeme</div>
-        <ul class="rank-features">
-          <li>VIP'in tüm özelliklerini içerir</li>
-          <li>Özel [VIP+] prefix etiketi</li>
-          <li>Günde 5 kit hakkı</li>
-          <li>Ekstra /home slot (10 adet)</li>
-          <li>Uçuş izni (Lobby)</li>
-          <li>Özel kostüm & parçacık efekti</li>
-          <li>Discord özel rolü</li>
-        </ul>
-        <button class="btn btn-purple" style="width:100%;justify-content:center;" onclick="startPurchase('VIP+ Rank', 150)">Satın Al — 150 ₺</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Kasa section -->
-  <div class="section" id="kasalar" style="padding-top:0;">
-    <div class="section-label">Kasalar</div>
-    <div class="section-title">Şansını Dene</div>
-    <p class="section-sub">Her kasa açılışında efsanevi ödüller seni bekliyor. Kazanmak için fırsatı kaçırma.</p>
-
-    <div class="rank-grid">
-      <!-- Golden Kasa -->
-      <div class="rank-card golden">
-        <div class="rank-badge badge-golden"><span class="rank-icon">🏆</span> Golden Kasa</div>
-        <div class="rank-price" style="color:#ff9d00">200 <span>₺</span></div>
-        <div class="rank-type">1 Kasa Açılışı</div>
-        <ul class="rank-features">
-          <li>Altın tier eşyalar garantisi</li>
-          <li>Nadir item şansı: %30</li>
-          <li>Efsanevi item şansı: %5</li>
-          <li>Özel kasa animasyonu</li>
-          <li>Bonus: 500 sunucu parası</li>
-        </ul>
-        <button class="btn" style="width:100%;justify-content:center;background:linear-gradient(135deg,#ffd700,#ff6b00);color:#000;" onclick="startPurchase('Golden Kasa', 200)">Satın Al — 200 ₺</button>
-      </div>
-
-      <!-- Risk Kasa -->
-      <div class="rank-card risk">
-        <div class="rank-badge badge-risk"><span class="rank-icon">🎲</span> Risk Kasa</div>
-        <div class="rank-price" style="color:var(--red)">200 <span>₺</span></div>
-        <div class="rank-type">1 Kasa Açılışı · Yüksek Risk</div>
-        <ul class="rank-features">
-          <li>Yüksek risk, yüksek ödül</li>
-          <li>Efsanevi item şansı: %15</li>
-          <li>Özel unvan kazanma şansı</li>
-          <li>Rank yükseltme çeki şansı</li>
-          <li>Özel efektli kasa açılışı</li>
-        </ul>
-        <button class="btn" style="width:100%;justify-content:center;background:linear-gradient(135deg,#f87171,#b91c1c);color:#fff;" onclick="startPurchase('Risk Kasa', 200)">Satın Al — 200 ₺</button>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- ════════════════ PAYMENTS PAGE ════════════════ -->
-<div id="page-payments" class="page">
-  <div class="section">
-    <div class="section-label">Ödemelerim</div>
-    <div class="section-title">Satın Alma Geçmişi</div>
-    <p class="section-sub">Tüm işlemlerinizi buradan takip edebilirsiniz.</p>
-
-    <!-- Purchase Form -->
-    <div id="purchase-panel" style="display:none;margin-bottom:48px;">
-      <div class="purchase-form">
-        <div class="form-title">🛒 Satın Al</div>
-        <div class="form-group">
-          <label>Ürün</label>
-          <input type="text" id="product-name" readonly style="opacity:.7;">
-        </div>
-        <div class="form-group">
-          <label>Minecraft Kullanıcı Adın</label>
-          <input type="text" id="mc-username" placeholder="Örn: CoolPlayer123">
-        </div>
-        <div class="form-group">
-          <label>Ödeme Yöntemi</label>
-          <div class="payment-methods">
-            <div class="pay-method selected" onclick="selectPay(this,'papara')"><span>💳</span> Papara</div>
-            <div class="pay-method" onclick="selectPay(this,'kripto')"><span>🪙</span> Kripto</div>
-            <div class="pay-method" onclick="selectPay(this,'paytr')"><span>🏦</span> PayTR</div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Fiyat</label>
-          <input type="text" id="product-price" readonly style="opacity:.7;">
-        </div>
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
-          <button class="btn btn-gold" style="flex:1;justify-content:center;" onclick="confirmPurchase()">Ödemeye Geç</button>
-          <button class="btn btn-outline" style="justify-content:center;" onclick="cancelPurchase()">İptal</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- History table -->
-    <div class="table-wrap">
-      <table class="payments-table">
-        <thead>
-          <tr>
-            <th>Tarih</th>
-            <th>Ürün</th>
-            <th>Tutar</th>
-            <th>Yöntem</th>
-            <th>Durum</th>
-          </tr>
-        </thead>
-        <tbody id="payments-body">
-          <tr>
-            <td colspan="5">
-              <div class="empty-state">
-                <div class="icon">📭</div>
-                <h3>Henüz işlem yok</h3>
-                <p>Market'ten bir şeyler satın alınca burada görünecek.</p>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
+    <button class="btn btn-gold" onclick="login()">Giriş Yap</button>
+    <div class="err" id="login-err"></div>
   </div>
 </div>
 
-<!-- ════════════════ SUPPORT PAGE ════════════════ -->
-<div id="page-support" class="page">
-  <div class="section">
-    <div class="section-label">Destek</div>
-    <div class="section-title">Nasıl Yardımcı Olalım?</div>
-    <p class="section-sub">Sorunlarını hızlıca çözmek için destek ekibimizle iletişime geç.</p>
+<!-- PANEL -->
+<div id="page-panel" class="panel-wrap">
+  <div class="topbar">
+    <div class="logo" style="margin:0;">
+      <div class="logo-hex" style="width:32px;height:32px;font-size:11px;">HN</div>
+      <span class="logo-text" style="font-size:18px;">Yönetim Paneli</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px;">
+      <span id="who"></span>
+      <span class="role-badge" id="role-badge"></span>
+      <span class="logout" onclick="logout()">Çıkış yap</span>
+    </div>
+  </div>
 
-    <div class="ticket-grid">
-      <!-- Ticket Form -->
-      <div class="ticket-form">
-        <div class="form-title">🎫 Destek Talebi Aç</div>
-        <div class="form-group">
-          <label>Minecraft Kullanıcı Adın</label>
-          <input type="text" id="sup-username" placeholder="CoolPlayer123">
-        </div>
-        <div class="form-group">
-          <label>Konu</label>
-          <select id="sup-topic">
-            <option value="">Konu seç...</option>
-            <option>Ödeme Sorunu</option>
-            <option>Rank Verilmedi</option>
-            <option>Kasa Açılmadı</option>
-            <option>Ban / Mute İtirazı</option>
-            <option>Hata Bildirimi</option>
-            <option>Diğer</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Açıklama</label>
-          <textarea id="sup-desc" placeholder="Sorunu detaylıca anlat..."></textarea>
-        </div>
-        <button class="btn btn-gold" style="width:100%;justify-content:center;" onclick="submitTicket()">Talep Gönder</button>
-      </div>
-
-      <!-- FAQ -->
-      <div>
-        <h3 style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;margin-bottom:20px;">Sık Sorulan Sorular</h3>
-        <div class="faq-list">
-          <div class="faq-item">
-            <div class="faq-q" onclick="toggleFaq(this)">Ödeme yaptım ama rank gelmedi?</div>
-            <div class="faq-a">Ödeme sonrası rank genellikle 1-5 dakika içinde aktif olur. Daha uzun sürerse destek talebi aç, işlem kanıtını paylaş.</div>
-          </div>
-          <div class="faq-item">
-            <div class="faq-q" onclick="toggleFaq(this)">Hangi ödeme yöntemleri geçerli?</div>
-            <div class="faq-a">Papara, PayTR (kredi/banka kartı) ve kripto para ile ödeme yapabilirsin.</div>
-          </div>
-          <div class="faq-item">
-            <div class="faq-q" onclick="toggleFaq(this)">Ranklar kalıcı mı?</div>
-            <div class="faq-a">Evet! VIP ve VIP+ rankları tek seferlik ödemeyle kalıcı olarak aktif olur, süresi dolmaz.</div>
-          </div>
-          <div class="faq-item">
-            <div class="faq-q" onclick="toggleFaq(this)">Sunucu hangi sürümleri destekliyor?</div>
-            <div class="faq-a">1.8'den 1.21'e kadar tüm Minecraft sürümleriyle oynayabilirsin.</div>
-          </div>
-          <div class="faq-item">
-            <div class="faq-q" onclick="toggleFaq(this)">İade politikası nedir?</div>
-            <div class="faq-a">Dijital ürünlerde (rank, kasa) iade yapılmamaktadır. Teknik sorun yaşarsan destek ekibi yardımcı olur.</div>
-          </div>
-        </div>
-
-        <div class="discord-cta">
-          <div>
-            <h3>Discord Sunucumuza Katıl</h3>
-            <p>Anında destek için Discord'da bize ulaş.</p>
-          </div>
-          <button class="btn" style="background:#fff;color:#5865F2;font-weight:700;flex-shrink:0;" onclick="toast('Discord bağlantısı demo modda!')">Discord'a Katıl</button>
-        </div>
-      </div>
+  <div class="cmd-grid">
+    <!-- Yardımcı+ -->
+    <div class="cmd-card" data-action="kick">
+      <h3>👢 Kick</h3>
+      <div class="form-group"><input placeholder="Oyuncu adı" id="kick-player"></div>
+      <div class="form-group"><input placeholder="Sebep (opsiyonel)" id="kick-reason"></div>
+      <button class="btn btn-gold" onclick="runCmd('kick',{player:val('kick-player'),reason:val('kick-reason')})">Kick At</button>
     </div>
 
-    <!-- Ticket History -->
-    <div style="margin-top:52px;">
-      <h3 style="font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;margin-bottom:20px;">Taleplerim</h3>
-      <div class="table-wrap">
-        <table class="payments-table">
-          <thead>
-            <tr><th>Tarih</th><th>Konu</th><th>Açıklama</th><th>Durum</th></tr>
-          </thead>
-          <tbody id="tickets-body">
-            <tr><td colspan="4">
-              <div class="empty-state">
-                <div class="icon">🎫</div>
-                <h3>Henüz talep yok</h3>
-                <p>Destek talebi oluşturunca burada görünecek.</p>
-              </div>
-            </td></tr>
-          </tbody>
-        </table>
-      </div>
+    <div class="cmd-card" data-action="mute">
+      <h3>🔇 Mute</h3>
+      <div class="form-group"><input placeholder="Oyuncu adı" id="mute-player"></div>
+      <div class="form-group"><input placeholder="Süre (örn: 10m, 1h)" id="mute-dur"></div>
+      <button class="btn btn-gold" onclick="runCmd('mute',{player:val('mute-player'),duration:val('mute-dur')})">Mute Uygula</button>
     </div>
 
+    <div class="cmd-card" data-action="kitVer">
+      <h3>🎁 Kit Ver</h3>
+      <div class="form-group"><input placeholder="Oyuncu adı" id="kit-player"></div>
+      <div class="form-group"><input placeholder="Kit adı" id="kit-name"></div>
+      <button class="btn btn-gold" onclick="runCmd('kitVer',{player:val('kit-player'),kit:val('kit-name')})">Kit Gönder</button>
+    </div>
+
+    <!-- Yönetici+ -->
+    <div class="cmd-card" data-action="ban">
+      <h3>⛔ Ban</h3>
+      <div class="form-group"><input placeholder="Oyuncu adı" id="ban-player"></div>
+      <div class="form-group"><input placeholder="Sebep" id="ban-reason"></div>
+      <button class="btn btn-red" onclick="runCmd('ban',{player:val('ban-player'),reason:val('ban-reason')})">Banla</button>
+    </div>
+
+    <div class="cmd-card" data-action="gamemode">
+      <h3>🎮 Gamemode</h3>
+      <div class="form-group"><input placeholder="Oyuncu adı" id="gm-player"></div>
+      <div class="form-group">
+        <select id="gm-mode">
+          <option value="survival">Survival</option>
+          <option value="creative">Creative</option>
+          <option value="adventure">Adventure</option>
+          <option value="spectator">Spectator</option>
+        </select>
+      </div>
+      <button class="btn btn-gold" onclick="runCmd('gamemode',{player:val('gm-player'),mode:val('gm-mode')})">Uygula</button>
+    </div>
+
+    <div class="cmd-card" data-action="whitelistAdd">
+      <h3>📋 Whitelist Ekle</h3>
+      <div class="form-group"><input placeholder="Oyuncu adı" id="wl-player"></div>
+      <button class="btn btn-gold" onclick="runCmd('whitelistAdd',{player:val('wl-player')})">Ekle</button>
+    </div>
+
+    <!-- Kurucu -->
+    <div class="cmd-card" data-action="op">
+      <h3>👑 OP Ver</h3>
+      <div class="form-group"><input placeholder="Oyuncu adı" id="op-player"></div>
+      <button class="btn btn-red" onclick="runCmd('op',{player:val('op-player')})">OP Yap</button>
+    </div>
+  </div>
+
+  <div class="console-box" id="console-box" style="display:none;">
+    <h3>💻 Ham Konsol Komutu (Sadece Kurucu)</h3>
+    <div class="form-group" style="margin-top:14px;">
+      <input placeholder="örn: whitelist off" id="console-cmd">
+    </div>
+    <button class="btn btn-red" onclick="runConsole()">Komutu Çalıştır</button>
+    <div class="console-out" id="console-out">Çıktı burada görünecek...</div>
   </div>
 </div>
 
-<!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="logo">
-    <div class="logo-hex" style="width:26px;height:26px;font-size:10px;">HN</div>
-    <span class="logo-text" style="font-size:16px;">HovaNetwork</span>
-  </div>
-  <span>© 2025 HovaNetwork · Tüm hakları saklıdır · play.hovanetwork.net</span>
-  <span style="color:var(--gold);font-size:12px;font-weight:600;">Minecraft sunucusu</span>
-</footer>
-
 <script>
-/* ── PAGE NAV ── */
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
-  document.getElementById('page-' + id).classList.add('active');
-  document.getElementById('nav-' + id).classList.add('active');
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  return false;
-}
+const API = ""; // Backend aynı origin'de yayınlanıyorsa boş bırak. Ayrı domain'deyse örn: "https://api.hovanetwork.net"
+let token = localStorage.getItem("hn_token") || "";
 
-/* ── TOAST ── */
-function toast(msg, color) {
+function val(id){ return document.getElementById(id).value.trim(); }
+
+function toast(msg, ok=true){
   const el = document.getElementById('toast');
   el.textContent = msg;
-  el.style.borderColor = color || 'rgba(255,215,0,.3)';
+  el.style.borderColor = ok ? 'rgba(74,222,128,.4)' : 'rgba(248,113,113,.4)';
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 3000);
+  setTimeout(()=>el.classList.remove('show'), 3000);
 }
 
-/* ── PURCHASE ── */
-let currentProduct = '';
-let currentPrice   = 0;
-let selectedPay    = 'papara';
+async function login(){
+  const username = val('login-user');
+  const password = val('login-pass');
+  const errEl = document.getElementById('login-err');
+  errEl.style.display = 'none';
 
-function startPurchase(name, price) {
-  currentProduct = name;
-  currentPrice   = price;
-  document.getElementById('product-name').value  = name;
-  document.getElementById('product-price').value = price + ' ₺';
-  document.getElementById('purchase-panel').style.display = 'block';
-  showPage('payments');
-  setTimeout(() => document.getElementById('purchase-panel').scrollIntoView({behavior:'smooth'}), 100);
+  try{
+    const r = await fetch(API + '/api/login', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({username, password})
+    });
+    const data = await r.json();
+    if(!r.ok){ errEl.textContent = data.error || 'Giriş başarısız'; errEl.style.display='block'; return; }
+
+    token = data.token;
+    localStorage.setItem('hn_token', token);
+    await loadPanel();
+  }catch(e){
+    errEl.textContent = 'Sunucuya bağlanılamadı';
+    errEl.style.display = 'block';
+  }
 }
 
-function cancelPurchase() {
-  document.getElementById('purchase-panel').style.display = 'none';
+function logout(){
+  localStorage.removeItem('hn_token');
+  token = '';
+  document.getElementById('page-panel').style.display = 'none';
+  document.getElementById('page-login').style.display = 'block';
 }
 
-function selectPay(el, method) {
-  selectedPay = method;
-  document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
-  el.classList.add('selected');
+async function loadPanel(){
+  const r = await fetch(API + '/api/me', { headers:{ 'Authorization': 'Bearer ' + token } });
+  if(!r.ok){ logout(); return; }
+  const me = await r.json();
+
+  document.getElementById('page-login').style.display = 'none';
+  document.getElementById('page-panel').style.display = 'block';
+  document.getElementById('who').textContent = me.username;
+  const badge = document.getElementById('role-badge');
+  const roleNames = { yardimci:'Yardımcı', yonetici:'Yönetici', kurucu:'Kurucu' };
+  badge.textContent = roleNames[me.role] || me.role;
+  badge.className = 'role-badge role-' + me.role;
+
+  // Her komut kartını yetkiye göre kilitle/aç
+  document.querySelectorAll('.cmd-card').forEach(card=>{
+    const action = card.dataset.action;
+    if(!me.allowedActions.includes(action)) card.classList.add('locked');
+    else card.classList.remove('locked');
+  });
+
+  document.getElementById('console-box').style.display = me.canRawConsole ? 'block' : 'none';
 }
 
-function confirmPurchase() {
-  const user = document.getElementById('mc-username').value.trim();
-  if (!user) { toast('⚠️ Lütfen kullanıcı adını gir!', 'rgba(248,113,113,.4)'); return; }
-
-  const tbody = document.getElementById('payments-body');
-  const emptyRow = tbody.querySelector('.empty-state');
-  if (emptyRow) emptyRow.closest('tr').remove();
-
-  const methods = { papara: 'Papara', kripto: 'Kripto', paytr: 'PayTR' };
-  const now = new Date().toLocaleDateString('tr-TR');
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td>${now}</td>
-    <td style="color:var(--text);font-weight:500;">${currentProduct}</td>
-    <td style="color:var(--gold);font-weight:600;">${currentPrice} ₺</td>
-    <td>${methods[selectedPay] || selectedPay}</td>
-    <td><span class="status-badge status-ok">✓ Başarılı</span></td>
-  `;
-  tbody.appendChild(tr);
-
-  document.getElementById('purchase-panel').style.display = 'none';
-  document.getElementById('mc-username').value = '';
-  toast(`🎉 ${currentProduct} satın alındı! (${user})`, 'rgba(74,222,128,.4)');
+async function runCmd(action, params){
+  try{
+    const r = await fetch(API + '/api/command', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({action, params})
+    });
+    const data = await r.json();
+    if(!r.ok){ toast(data.error || 'Hata oluştu', false); return; }
+    toast('✅ Komut çalıştırıldı: ' + data.command);
+  }catch(e){
+    toast('Sunucuya bağlanılamadı', false);
+  }
 }
 
-/* ── SUPPORT TICKET ── */
-function submitTicket() {
-  const user  = document.getElementById('sup-username').value.trim();
-  const topic = document.getElementById('sup-topic').value;
-  const desc  = document.getElementById('sup-desc').value.trim();
-  if (!user || !topic || !desc) { toast('⚠️ Tüm alanları doldurun!', 'rgba(248,113,113,.4)'); return; }
-
-  const tbody = document.getElementById('tickets-body');
-  const emptyRow = tbody.querySelector('.empty-state');
-  if (emptyRow) emptyRow.closest('tr').remove();
-
-  const now = new Date().toLocaleDateString('tr-TR');
-  const tr = document.createElement('tr');
-  tr.innerHTML = `
-    <td>${now}</td>
-    <td style="color:var(--text);font-weight:500;">${topic}</td>
-    <td>${desc.length > 40 ? desc.slice(0,40)+'…' : desc}</td>
-    <td><span class="status-badge status-pending">⏳ Bekliyor</span></td>
-  `;
-  tbody.appendChild(tr);
-
-  document.getElementById('sup-username').value = '';
-  document.getElementById('sup-topic').value = '';
-  document.getElementById('sup-desc').value = '';
-  toast('🎫 Talep açıldı! Yakında dönüş yapılacak.', 'rgba(255,215,0,.4)');
+async function runConsole(){
+  const command = val('console-cmd');
+  if(!command) return;
+  try{
+    const r = await fetch(API + '/api/console', {
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({command})
+    });
+    const data = await r.json();
+    const out = document.getElementById('console-out');
+    if(!r.ok){ out.textContent = '❌ ' + (data.error||'Hata'); return; }
+    out.textContent = '> ' + data.command + '\n' + (data.response || '(boş yanıt)');
+  }catch(e){
+    document.getElementById('console-out').textContent = '❌ Sunucuya bağlanılamadı';
+  }
 }
 
-/* ── FAQ ── */
-function toggleFaq(el) {
-  const item = el.closest('.faq-item');
-  item.classList.toggle('open');
-}
+// Sayfa yüklenince token varsa otomatik giriş dene
+if(token) loadPanel();
 </script>
 </body>
 </html>
